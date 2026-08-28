@@ -1,0 +1,157 @@
+name: Isolated public HRRRv4 calibration
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Exact frozen acquisition lane
+        required: true
+        type: choice
+        options:
+          - training
+          - evaluation
+      training_run_id:
+        description: Required successful public training run for evaluation only
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: isolated-public-hrrrv4-${{ inputs.mode }}
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: scripts/requirements-ecmwf-open-data.txt
+      - name: Validate exact lane inputs
+        env:
+          MODE: ${{ inputs.mode }}
+          TRAINING_RUN_ID: ${{ inputs.training_run_id }}
+        run: |
+          [[ "$MODE" == 'training' || "$MODE" == 'evaluation' ]]
+          [[ -z "$TRAINING_RUN_ID" || "$TRAINING_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$MODE" == 'evaluation' && -n "$TRAINING_RUN_ID" || "$MODE" == 'training' && -z "$TRAINING_RUN_ID" ]]
+      - name: Verify immutable public assets
+        run: |
+          cd assets
+          sha256sum -c SHA256SUMS
+          jq -e '
+            .schema == "mimir_hrrrv4_publication_manifest_v1" and
+            .private_source_sha == "55e6697381aafef7acf535ca64f0100dc426ca57" and
+            .partial_training.original_run_id == "33161389066" and
+            .partial_training.original_artifact_digest == "sha256:3945684f501b8abd775d312aacf2d17f194d8dae831f906077cc4fb85b125bae" and
+            .partial_training.completed_dates == 324 and
+            .partial_training.first_market_date == "2022-07-10" and
+            .partial_training.last_market_date == "2023-05-29" and
+            .frozen_evaluation.start_market_date == "2023-07-10" and
+            .frozen_evaluation.end_market_date == "2024-03-15" and
+            .frozen_evaluation.independent_dates == 250
+          ' PUBLICATION_MANIFEST.json >/dev/null
+          xz --decompress --keep mimir-hrrr-capture-55e66973.xz
+          xz --decompress --keep mimir-hrrr-evaluate-55e66973.xz
+          chmod 0555 mimir-hrrr-capture-55e66973 mimir-hrrr-evaluate-55e66973
+          sha256sum -c EXECUTABLE_SHA256SUMS
+      - name: Install pinned ecCodes decoder
+        run: python3 -m pip install --disable-pip-version-check -r scripts/requirements-ecmwf-open-data.txt
+      - name: Verify decoder without inherited loader authority
+        run: env -u LD_LIBRARY_PATH python3 -c 'import eccodes; assert eccodes.codes_get_api_version() == "2.48.0"'
+      - name: Restore frozen public training partial
+        if: inputs.mode == 'training'
+        run: |
+          umask 077
+          mkdir -p /tmp/mimir-hrrr-public
+          tar -xzf assets/mimir-hrrr-training-33161389066-partial.tar.gz -C /tmp/mimir-hrrr-public
+          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          jq -e '.schema == "hrrr_v4_archive_run_v1" and .run_id == "33161389066" and .head_sha == "78613606318b4130df07c3838fd4ba993e0593f6" and .mode == "training"' "$root/run.json" >/dev/null
+          mv "$root/run.json" "$root/private-resume-source.json"
+      - name: Restore exact public training result
+        if: inputs.mode == 'evaluation'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: hrrrv4-public-training-${{ inputs.training_run_id }}
+          path: /tmp/mimir-hrrr-training
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.training_run_id }}
+          digest-mismatch: error
+      - name: Validate exact public training result
+        if: inputs.mode == 'evaluation'
+        run: |
+          root=/tmp/mimir-hrrr-training/mimir-hrrr-archive
+          jq -e '.schema == "hrrr_v4_public_runner_run_v1" and .mode == "training"' "$root/run.json" >/dev/null
+          cd "$root"
+          sha256sum -c SHA256SUMS
+      - name: Initialize immutable public run manifest
+        env:
+          MODE: ${{ inputs.mode }}
+          TRAINING_RUN_ID: ${{ inputs.training_run_id }}
+        run: |
+          umask 077
+          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          mkdir -p "$root"
+          jq -n \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg head_sha "$GITHUB_SHA" \
+            --arg mode "$MODE" \
+            --arg training_run_id "$TRAINING_RUN_ID" \
+            '{schema:"hrrr_v4_public_runner_run_v1",run_id:$run_id,head_sha:$head_sha,mode:$mode,training_run_id:(if $training_run_id == "" then null else $training_run_id end),private_source_sha:"55e6697381aafef7acf535ca64f0100dc426ca57",capture_executable_sha256:"b7417edf10f30f27457c143740e931559eb28c71d62bad10c7eab8677e0cead6",evaluation_executable_sha256:"857f464e2638413ced4e1c657fed058f220ccd135e8678033d6e7dd499cc271a"}' \
+            > "$root/run.json"
+      - name: Acquire exact frozen HRRR lane
+        id: acquisition
+        continue-on-error: true
+        env:
+          MODE: ${{ inputs.mode }}
+          ACQUISITION_TIMEOUT: 330m
+        run: |
+          case "$MODE" in
+            training) start='2022-07-10'; end='2023-07-09'; max_requests='7000' ;;
+            evaluation) start='2023-07-10'; end='2024-03-15'; max_requests='5000' ;;
+            *) exit 1 ;;
+          esac
+          timeout --signal=TERM --kill-after=30s "$ACQUISITION_TIMEOUT" env -u LD_LIBRARY_PATH \
+            ./assets/mimir-hrrr-capture-55e66973 -- \
+              --start-date "$start" --end-date "$end" \
+              --output-dir /tmp/mimir-hrrr-public/mimir-hrrr-archive/capture \
+              --max-requests "$max_requests" --concurrency 4 >/dev/null
+          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          jq '{schema,request_policy,design,coverage}' "$root/capture/capture.json"
+          cd "$root"
+          sha256sum run.json capture/capture.json > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - name: Evaluate single frozen untouched HRRR hypothesis
+        id: evaluation
+        if: inputs.mode == 'evaluation' && steps.acquisition.outcome == 'success'
+        continue-on-error: true
+        run: |
+          ./assets/mimir-hrrr-evaluate-55e66973 -- \
+            --training /tmp/mimir-hrrr-training/mimir-hrrr-archive/capture/capture.json \
+            --evaluation /tmp/mimir-hrrr-public/mimir-hrrr-archive/capture/capture.json \
+            --output /tmp/mimir-hrrr-public/mimir-hrrr-archive/evaluation.json >/dev/null
+          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          jq '{schema,design,evaluation}' "$root/evaluation.json"
+          cd "$root"
+          sha256sum run.json capture/capture.json evaluation.json > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - name: Upload immutable public HRRR artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hrrrv4-public-${{ inputs.mode }}-${{ github.run_id }}
+          path: /tmp/mimir-hrrr-public
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve terminal acquisition or evaluation failure
+        if: always() && (steps.acquisition.outcome != 'success' || (inputs.mode == 'evaluation' && steps.evaluation.outcome != 'success'))
+        run: exit 1

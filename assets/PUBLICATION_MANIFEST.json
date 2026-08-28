@@ -1,0 +1,26 @@
+{
+  "schema": "mimir_hrrrv4_publication_manifest_v1",
+  "research_only": true,
+  "public_repository_contains_trading_capability": false,
+  "private_repository": "R4P7UR3-42/Mimir",
+  "private_source_sha": "55e6697381aafef7acf535ca64f0100dc426ca57",
+  "executables": {
+    "capture_sha256": "b7417edf10f30f27457c143740e931559eb28c71d62bad10c7eab8677e0cead6",
+    "evaluation_sha256": "857f464e2638413ced4e1c657fed058f220ccd135e8678033d6e7dd499cc271a"
+  },
+  "partial_training": {
+    "original_run_id": "33161389066",
+    "original_head_sha": "78613606318b4130df07c3838fd4ba993e0593f6",
+    "original_artifact_digest": "sha256:3945684f501b8abd775d312aacf2d17f194d8dae831f906077cc4fb85b125bae",
+    "completed_dates": 324,
+    "first_market_date": "2022-07-10",
+    "last_market_date": "2023-05-29",
+    "frozen_end_market_date": "2023-07-09"
+  },
+  "frozen_evaluation": {
+    "start_market_date": "2023-07-10",
+    "end_market_date": "2024-03-15",
+    "independent_dates": 250,
+    "inspected_before_publication": false
+  }
+}

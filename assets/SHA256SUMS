@@ -1,0 +1,5 @@
+6f19e5d2e1c9362668177679c341c10a27a1b689ad9eb7286d4869e8f83eaaf1  mimir-hrrr-capture-55e66973.xz
+6bb50ed47a396b1b8d2f84876a69c9d8a422810a1c5cf1d78442764d3550620e  mimir-hrrr-evaluate-55e66973.xz
+da290c6fb978665fe47131f508f7b3b6afbb628329e2fa1df6175cf2a5d62e0f  mimir-hrrr-training-33161389066-partial.tar.gz
+778b40c16242af75459aa10d530801909d1f2641b6958bb5b0f521cfa6e80b6c  ../scripts/decode-hrrr-archive-grib.py
+140a23952a22d9809dc837f750aec73f9c4225f5e0d26b04ea9c679bc3060db9  ../scripts/requirements-ecmwf-open-data.txt
