@@ -36,7 +36,7 @@ NETWORK_LIMIT = 12_000
 BOOTSTRAP_SAMPLES = 10_000
 LCG_SEED = 0x48525234
 BASE_URL = "https://api.elections.kalshi.com/trade-api/v2"
-PREDECLARATION_SHA256 = "bb4dcf53b35677ce182e47d5c86240d5c6458d99e788fc57046e0df82f650aa7"
+PREDECLARATION_SHA256 = "d4633458eb21724b65507df72eab28810ea60cea1748d0ccf24d7649d09b8f5f"
 BANDS = (
     ("0.900_0.925", Decimal("0.900"), Decimal("0.925")),
     ("0.925_0.950", Decimal("0.925"), Decimal("0.950")),
@@ -385,7 +385,18 @@ def fetch_trade_proxy(client: PublicClient, selection: dict, trade_cutoff: str) 
     if not eligible:
         return None
     created, price, trade_id, count = sorted(eligible, key=lambda row: (row[0], row[1], row[2]))[0]
-    return {"trade_id": trade_id, "created_at": created.isoformat().replace("+00:00", "Z"), "no_price": str(price), "count": str(count), "fee": str(fee(price)), "source_url": url}
+    return {
+        "trade_id": trade_id, "created_at": created.isoformat().replace("+00:00", "Z"),
+        "trade_no_price": str(price), "trade_count": str(count), "source_url": url,
+    }
+
+
+def supported_submission_return(selection: dict, proxy: dict | None) -> Decimal:
+    if proxy is None:
+        return Decimal(0)
+    limit = decimal(selection["no_price_proxy"], "NO limit")
+    exact_fee = fee(limit)
+    return Decimal(1) - limit - exact_fee if selection["outcome_no"] == 1 else -limit - exact_fee
 
 
 def maximum_drawdown(values: list[Decimal]) -> Decimal:
@@ -505,11 +516,7 @@ def run_audit(report_path: Path, capture_path: Path, output_dir: Path, maximum: 
         selected = candidates[0]
         proxy = fetch_trade_proxy(client, selected, cutoffs["trades_created_ts"])
         selected["public_trade_proxy"] = proxy
-        if proxy is None:
-            selected["submission_return"] = "0"
-        else:
-            price, exact_fee = decimal(proxy["no_price"], "trade price"), decimal(proxy["fee"], "trade fee")
-            selected["submission_return"] = str(Decimal(1) - price - exact_fee if selected["outcome_no"] == 1 else -price - exact_fee)
+        selected["submission_return"] = str(supported_submission_return(selected, proxy))
         selections.append(selected)
     evaluation = evaluate_selections(selections)
     output = {
