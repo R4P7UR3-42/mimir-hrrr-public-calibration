@@ -2,6 +2,11 @@ name: Hard-gated HRRR executable economics
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Isolated conservative HRRRv4 successor
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -13,7 +18,12 @@ concurrency:
 
 jobs:
   evaluate:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.id == 33291428414 &&
+       github.event.workflow_run.head_sha == 'd313b7bd86b2bc7e59de0411d2625d4191412895' &&
+       github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
