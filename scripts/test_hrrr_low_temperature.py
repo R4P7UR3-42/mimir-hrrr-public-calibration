@@ -99,6 +99,11 @@ class LowTemperatureCalibrationTest(unittest.TestCase):
         workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-calibration.yml").read_text()
         self.assertIn('run-id: "33204106231"', workflow)
         self.assertIn('run-id: "33291428414"', workflow)
+        self.assertIn(
+            "--training-capture-root /var/tmp/mimir-low-temperature-training/mimir-hrrr-archive/capture",
+            workflow,
+        )
+        self.assertIn("--evaluation-capture-root /var/tmp/mimir-low-temperature-evaluation/capture", workflow)
         self.assertIn("runs-on: ubuntu-latest", workflow)
         self.assertNotIn("self-hosted", workflow)
         self.assertNotIn("secrets.", workflow)
