@@ -5,7 +5,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
 
 env:
   TMPDIR: /var/tmp
@@ -31,19 +30,28 @@ jobs:
           python3 -m unittest scripts/test_hrrr_low_temperature_launch_economics.py
           echo 'dbc3231320b13240fd2e42fc5047c58a446247c28ba8ce624d518dc28e5fc163  LOW_TEMPERATURE_LAUNCH_ECONOMICS_PREDECLARATION.md' | sha256sum -c
       - name: Restore sealed provider inventory
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: hrrrv4-low-temperature-economics-33319871449
-          path: /var/tmp/mimir-low-temperature-sealed-inventory
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: "33319871449"
-          digest-mismatch: error
+        run: |
+          seal="$GITHUB_WORKSPACE/data/results/hrrr-v4-low-temperature-launch-partial-cache-v1"
+          cache=/var/tmp/mimir-low-temperature-sealed-inventory
+          mkdir -p "$cache"
+          echo '569d2fb4535d42be3937d76d46ea44a85799e43d756f35523aeaab066ea9db4d  data/results/hrrr-v4-low-temperature-launch-partial-cache-v1/raw.tar.gz' | sha256sum -c
+          jq -e '
+            .schema == "hrrr_v4_low_temperature_launch_partial_cache_seal_v1" and
+            .source_run_id == 33324290727 and
+            .source_head_sha == "57ca65566d1737344db5949ae8c0a8cad49b2871" and
+            .request_records == 201 and
+            .inherited_cache_hits == 95 and
+            .new_network_requests == 106 and
+            .outcomes_scored_before_seal == false and
+            .active_trading_capability_changed == false
+          ' "$seal/manifest.json" >/dev/null
+          tar -xzf "$seal/raw.tar.gz" -C "$cache"
+          cp "$GITHUB_WORKSPACE/data/results/hrrr-v4-low-temperature-economics-v1/report.json" "$cache/report.json"
       - name: Verify sealed provider inventory
         run: |
           cd /var/tmp/mimir-low-temperature-sealed-inventory
-          sha256sum -c SHA256SUMS
           echo '41f2c19984ec09c50eebc0fd4da3906333314d69988a2ea1f8f29a5751d0e1c9  report.json' | sha256sum -c
+          test "$(find raw -name '*.request.json' | wc -l)" -eq 201
       - name: Restore exact sealed launch-window capture
         id: acquisition
         continue-on-error: true
