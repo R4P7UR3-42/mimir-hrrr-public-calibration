@@ -1,0 +1,67 @@
+name: Immutable HRRR GRIB-to-Zarr transport cross-check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  TMPDIR: /var/tmp
+
+concurrency:
+  group: hrrr-zarr-transport-crosscheck-v1
+  cancel-in-progress: false
+
+jobs:
+  crosscheck:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: v2.9.2
+      - name: Verify exact transport implementation and predeclaration
+        run: |
+          deno fmt --check scripts/hrrr_zarr_transport.ts scripts/hrrr_zarr_transport_test.ts scripts/crosscheck_hrrr_zarr_transport.ts
+          deno check scripts/hrrr_zarr_transport.ts scripts/crosscheck_hrrr_zarr_transport.ts
+          deno test scripts/hrrr_zarr_transport_test.ts
+          echo 'dc47f562b1a660148dd82b99dc6ca190fa58f236dce343586fd819c77e464485  ZARR_CROSSCHECK_PREDECLARATION.md' | sha256sum -c
+      - name: Restore exact immutable GRIB reference
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: hrrrv4-current-grib-reference-33303461758
+          path: /var/tmp/mimir-hrrr-current-grib-reference
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: "33303461758"
+          digest-mismatch: error
+      - name: Compare exact NOAA GRIB and NODD Zarr values
+        run: |
+          cd /var/tmp/mimir-hrrr-current-grib-reference
+          sha256sum -c SHA256SUMS
+          cd "$GITHUB_WORKSPACE"
+          umask 077
+          mkdir -p /var/tmp/mimir-hrrr-zarr-crosscheck
+          deno run \
+            --allow-read=/var/tmp/mimir-hrrr-current-grib-reference/reference.json \
+            --allow-write=/var/tmp/mimir-hrrr-zarr-crosscheck/crosscheck.json \
+            --allow-net=hrrrzarr.s3.amazonaws.com:443 \
+            scripts/crosscheck_hrrr_zarr_transport.ts \
+            /var/tmp/mimir-hrrr-current-grib-reference/reference.json \
+            /var/tmp/mimir-hrrr-zarr-crosscheck/crosscheck.json
+          jq '{schema,run_date,run_hour_utc,requests,compared_station_steps,exact_float32_matches,maximum_absolute_difference_kelvin,passes}' \
+            /var/tmp/mimir-hrrr-zarr-crosscheck/crosscheck.json
+          cd /var/tmp/mimir-hrrr-zarr-crosscheck
+          sha256sum crosscheck.json > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - name: Upload immutable cross-check artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hrrrv4-grib-zarr-crosscheck-${{ github.run_id }}
+          path: /var/tmp/mimir-hrrr-zarr-crosscheck
+          if-no-files-found: error
+          retention-days: 30

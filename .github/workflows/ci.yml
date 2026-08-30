@@ -16,6 +16,9 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.14"
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: v2.9.2
       - run: python3 -m py_compile scripts/evaluate_hrrr_conservative_successor.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_executable_economics.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_later_executable.py
@@ -24,3 +27,6 @@ jobs:
       - run: python3 -m unittest scripts/test_hrrr_executable_economics.py
       - run: python3 -m unittest scripts/test_hrrr_later_executable.py
       - run: python3 -m unittest scripts/test_hrrr_current_grib_reference.py
+      - run: deno fmt --check scripts/hrrr_zarr_transport.ts scripts/hrrr_zarr_transport_test.ts scripts/crosscheck_hrrr_zarr_transport.ts
+      - run: deno check scripts/hrrr_zarr_transport.ts scripts/crosscheck_hrrr_zarr_transport.ts
+      - run: deno test scripts/hrrr_zarr_transport_test.ts
