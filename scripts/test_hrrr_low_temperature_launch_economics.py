@@ -61,18 +61,14 @@ class LowTemperatureLaunchEconomicsTest(unittest.TestCase):
         self.assertIn('if len(lower) > 1:', source)
         self.assertIn('duplicate lower outer contracts', source)
 
-    def test_public_workflow_is_free_and_isolated(self):
-        workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-launch-economics.yml").read_text()
-        self.assertIn("hrrr-v4-low-temperature-launch-partial-cache-v1", workflow)
-        self.assertIn("source_run_id == 33320248649", workflow)
-        self.assertIn("capture.tar.gz", workflow)
-        self.assertIn("runs-on: ubuntu-latest", workflow)
-        self.assertIn("--max-requests 10000", workflow)
-        self.assertNotIn("mimir-hrrr-capture-55e66973 --", workflow)
-        self.assertNotIn("self-hosted", workflow)
-        self.assertNotIn("secrets.", workflow)
-        self.assertNotIn("portfolio", workflow)
-        self.assertNotIn("actions/download-artifact", workflow)
+    def test_consumed_workflow_is_retired_and_terminal_report_is_exact(self):
+        workflow = MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-launch-economics.yml"
+        self.assertFalse(workflow.exists())
+        report = MODULE_PATH.parents[1] / "data/results/hrrr-v4-low-temperature-launch-economics-v1/report.json"
+        self.assertEqual(
+            launch.prior.econ.file_sha256(report),
+            "cb89830c8328205ad9a8b9150d4d584634623cf4978c5cd6ff8e4eeccc8f3e22",
+        )
 
 
 if __name__ == "__main__":
