@@ -58,7 +58,8 @@ inventory existed on only 28 dates near the end of its 250-day weather window. `
 therefore freezes one later 250-date validation from `2024-11-21` through `2025-07-28` without changing the already
 passing model or any price, fee, edge, proxy, clustering, drawdown, or concentration boundary. A weather-only workflow
 must pass every frozen calibration gate before a separate automatically triggered workflow can access later-window
-prices. This successor remains research-only and non-authorizing.
+prices. That handoff is bound to calibration run `33300096256` and exact acquisition head `58f8881a…`; a later run or
+code revision cannot inherit price access. This successor remains research-only and non-authorizing.
 
 ## Dependency-free current transport cross-check
 

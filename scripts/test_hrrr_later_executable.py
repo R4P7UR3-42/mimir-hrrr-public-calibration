@@ -186,6 +186,8 @@ class LaterExecutableTest(unittest.TestCase):
         self.assertIn("available >= 5 * 1024 * 1024 * 1024", weather)
         self.assertIn("workflows:\n      - Later-window frozen HRRRv4 calibration", price)
         self.assertLess(price.index("Hard gate exact later calibration before price access"), price.index("Acquire bounded public price and trade evidence"))
+        self.assertIn("github.event.workflow_run.id == 33300096256", price)
+        self.assertIn("github.event.workflow_run.head_sha == '58f8881a86c63c932b6731f6330ad13eafd15694'", price)
         self.assertIn("github.event.workflow_run.head_branch == 'main'", price)
 
 
