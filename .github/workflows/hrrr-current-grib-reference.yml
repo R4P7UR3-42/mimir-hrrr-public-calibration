@@ -1,0 +1,52 @@
+name: Immutable current HRRR GRIB reference
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TMPDIR: /var/tmp
+
+concurrency:
+  group: hrrr-current-grib-reference-v1
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: scripts/requirements-ecmwf-open-data.txt
+      - name: Verify exact frozen protocol
+        run: |
+          python3 -m py_compile scripts/capture_hrrr_current_grib_reference.py
+          python3 -m unittest scripts/test_hrrr_current_grib_reference.py
+          echo 'dc47f562b1a660148dd82b99dc6ca190fa58f236dce343586fd819c77e464485  ZARR_CROSSCHECK_PREDECLARATION.md' | sha256sum -c
+      - name: Install pinned ecCodes decoder
+        run: |
+          python3 -m pip install --disable-pip-version-check -r scripts/requirements-ecmwf-open-data.txt
+          env -u LD_LIBRARY_PATH python3 -c 'import eccodes; assert eccodes.codes_get_api_version() == "2.48.0"'
+      - name: Capture exact NOAA GRIB reference
+        run: |
+          umask 077
+          python3 scripts/capture_hrrr_current_grib_reference.py \
+            --output-dir /var/tmp/mimir-hrrr-current-grib-reference
+          cd /var/tmp/mimir-hrrr-current-grib-reference
+          sha256sum reference.json > SHA256SUMS
+          sha256sum -c SHA256SUMS
+          jq '{schema,research_only,run_date,run_hour_utc,steps_hours,station_count,request_count}' reference.json
+      - name: Upload immutable reference artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hrrrv4-current-grib-reference-${{ github.run_id }}
+          path: /var/tmp/mimir-hrrr-current-grib-reference
+          if-no-files-found: error
+          retention-days: 30

@@ -59,3 +59,11 @@ therefore freezes one later 250-date validation from `2024-11-21` through `2025-
 passing model or any price, fee, edge, proxy, clustering, drawdown, or concentration boundary. A weather-only workflow
 must pass every frozen calibration gate before a separate automatically triggered workflow can access later-window
 prices. This successor remains research-only and non-authorizing.
+
+## Dependency-free current transport cross-check
+
+The one-time `Immutable current HRRR GRIB reference` workflow captures the exact 2026-08-29 12Z NOAA source at all nine
+frozen steps and 20 stations using the already pinned ecCodes decoder and an exact 18-request budget. Its immutable
+output exists only to compare NOAA's GRIB values with the NODD-listed MesoWest Zarr representation before considering a
+native Deno transport. A mismatch rejects that transport. The canary cannot change calibration, economics, policy,
+capital, cohort, production-provider, recommendation, or order authority.
