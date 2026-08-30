@@ -25,6 +25,11 @@ recommendation, capital, deployment, or order.
 
 ## Frozen low-temperature successor
 
+The consumed initial rejection is recorded in [`LOW_TEMPERATURE_INITIAL_RESULT.md`](LOW_TEMPERATURE_INITIAL_RESULT.md).
+The separately frozen Wilson-90 successor is defined in
+[`LOW_TEMPERATURE_WILSON90_PREDECLARATION.md`](LOW_TEMPERATURE_WILSON90_PREDECLARATION.md) and runs only on public hosted
+infrastructure with a free NOAA outcome source.
+
 The daily-low family is materially distinct from the consumed daily-high residual experiments. The frozen
 `hrrr_v4_low_temperature_station_wilson95_v1` model derives the minimum of each parent capture's exact eight
 native-three-hour HRRRv4 points, fits only on 250 previously uninspected TMIN training dates, and evaluates exactly 250
