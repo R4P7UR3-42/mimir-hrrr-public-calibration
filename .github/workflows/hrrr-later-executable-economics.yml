@@ -36,7 +36,7 @@ jobs:
         run: |
           python3 -m py_compile scripts/evaluate_hrrr_later_executable.py
           python3 -m unittest scripts/test_hrrr_later_executable.py scripts/test_hrrr_executable_economics.py
-          echo '788bf00610856c12047a9d5b7d34669f1f37f5c2f52f51c8271b903a07c540d8  LATER_EXECUTABLE_PREDECLARATION.md' | sha256sum -c
+          echo 'bfc97c05652b1d458e3e59ba49a90d7e6a1028de1978e3fac0dd4d4be4622be1  LATER_EXECUTABLE_PREDECLARATION.md' | sha256sum -c
       - name: Restore exact passing parent OOS artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:

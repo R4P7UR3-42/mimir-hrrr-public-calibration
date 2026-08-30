@@ -51,9 +51,11 @@ may support a non-guaranteed projection to `$100`.
 ## Acquisition and authority boundary
 
 The later weather capture uses the existing checksum-bound public NOAA executable, at most 5,000 requests, concurrency
-four, bounded decoder and outer timeouts, create-once artifacts, and pinned ecCodes. The economics run uses public Kalshi
-GET endpoints only, at most 12,000 requests, no retry, at most four starts per second, and terminal HTTP 429 handling.
-Both workflows use `/var/tmp`, upload checksummed immutable artifacts, and refuse the production Mimir host.
+four, bounded decoder and outer timeouts, create-once artifacts, and pinned ecCodes. Because that immutable executable
+predates `/var/tmp` admission, its output uses the explicitly permitted `data/review-artifacts` root on the GitHub
+checkout volume after a 5 GiB free-capacity preflight; it never uses the runner's root `/tmp`. The economics run uses
+`/var/tmp` and public Kalshi GET endpoints only, at most 12,000 requests, no retry, at most four starts per second, and
+terminal HTTP 429 handling. Both workflows upload checksummed immutable artifacts and refuse the production Mimir host.
 
 This validation is research only. It cannot provide provider-confirmed fills, capital authority, a production cohort,
 recommendations, deployment authority, or orders. Any later trading decision requires a separate reviewed Mimir change

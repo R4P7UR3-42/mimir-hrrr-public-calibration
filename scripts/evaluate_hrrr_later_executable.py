@@ -22,7 +22,7 @@ MODEL = economics.MODEL
 START, END, DATE_COUNT = dt.date(2024, 11, 21), dt.date(2025, 7, 28), 250
 CALIBRATION_SCHEMA = "hrrr_v4_frozen_model_later_validation_v1"
 ECONOMICS_SCHEMA = "hrrr_v4_frozen_model_later_executable_economics_v1"
-PREDECLARATION_SHA256 = "788bf00610856c12047a9d5b7d34669f1f37f5c2f52f51c8271b903a07c540d8"
+PREDECLARATION_SHA256 = "bfc97c05652b1d458e3e59ba49a90d7e6a1028de1978e3fac0dd4d4be4622be1"
 NETWORK_LIMIT = 12_000
 
 
