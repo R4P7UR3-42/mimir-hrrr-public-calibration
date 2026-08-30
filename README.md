@@ -79,6 +79,31 @@ calibration run `33300096256` and exact acquisition head `58f8881a…`; a later
 run or code revision cannot inherit price access. This successor remains
 research-only and non-authorizing.
 
+The pinned later weather run finished with 4,500 selected predictions across 11
+stations and 250 dates, positive Brier skill `0.108999`, and a positive overall
+clustered-95 calibration margin. It nevertheless failed the predeclared
+leave-one-station-out gate: excluding `KLAS` produced `-0.002350` and excluding
+`KPHX` produced `-0.001030`. Its economics trigger was therefore skipped. Those
+dates are consumed development evidence and receive no profitability or trading
+credit.
+
+## Frozen 615-date refit successor
+
+`REFIT_SUCCESSOR_PREDECLARATION.md` freezes the sole next model before acquiring
+another interval. It refits every exact station/distance Jeffreys count on the
+original 365 training dates plus the already-consumed 250 parent-OOS dates,
+while preserving the single `0.035` haircut and every calibration gate. The
+checked-in artifact freezes probabilities to six decimals before any evaluation
+and preserves climatology as integer successes and samples.
+
+The failed later interval is used only as inspected development data. On that
+interval the refit passes all 12 gates with clustered-95 lower margin
+`+0.010927`; this is reachability support, not OOS credit. The new workflow
+evaluates exactly 250 untouched dates from `2025-07-29` through `2026-04-04`.
+Failure consumes the interval and stops the model. A pass can trigger only a
+separately pinned executable-economics review; it creates no adapter, policy,
+cohort, capital, recommendation, production deployment, or order authority.
+
 ## Dependency-free current transport cross-check
 
 The one-time `Immutable current HRRR GRIB reference` workflow captures the exact
