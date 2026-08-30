@@ -95,19 +95,9 @@ class LowTemperatureCalibrationTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "step is duplicated"):
                 low.load_forecast_minima(root, ("2024-01-01", "2024-01-01", 1, "run"))
 
-    def test_public_workflow_stays_isolated(self):
-        workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-calibration.yml").read_text()
-        self.assertIn('run-id: "33204106231"', workflow)
-        self.assertIn('run-id: "33291428414"', workflow)
-        self.assertIn(
-            "--training-capture-root /var/tmp/mimir-low-temperature-training/mimir-hrrr-archive/capture",
-            workflow,
-        )
-        self.assertIn("--evaluation-capture-root /var/tmp/mimir-low-temperature-evaluation/capture", workflow)
-        self.assertIn("runs-on: ubuntu-latest", workflow)
-        self.assertNotIn("self-hosted", workflow)
-        self.assertNotIn("secrets.", workflow)
-        self.assertNotIn("external-api.kalshi.com", workflow)
+    def test_consumed_public_workflow_is_retired(self):
+        workflow = MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-calibration.yml"
+        self.assertFalse(workflow.exists())
 
 
 if __name__ == "__main__":
