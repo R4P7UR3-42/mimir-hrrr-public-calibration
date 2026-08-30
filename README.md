@@ -41,6 +41,10 @@ that identity fails. A passing parent may then be evaluated at the fixed 20:05 U
 `$0.70`–`$0.97` price interval, exact quadratic fees, `$0.015` edge floor, one selection per date, whole-date clustered
 returns, station holdouts, concentration, and drawdown limits.
 
+Completion of that one exact run triggers the economics workflow automatically only when both its run ID and head SHA
+match. The downloaded report still has to pass the full offline semantic gate, so a green acquisition workflow with a
+negative model decision cannot reach the price step.
+
 Historical minute candles have no displayed-depth proof. The audit therefore labels a qualifying later public trade as
 a trade-through proxy, assigns zero return when that proxy is absent, and never calls it a provider-confirmed fill.
 Even positive initial or scale research evidence cannot authorize capital, deployment, recommendations, or orders.

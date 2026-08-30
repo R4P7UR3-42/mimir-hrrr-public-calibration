@@ -77,6 +77,19 @@ class ExecutableEconomicsTest(unittest.TestCase):
         predeclaration = MODULE_PATH.parents[1] / "ECONOMICS_PREDECLARATION.md"
         self.assertEqual(economics.file_sha256(predeclaration), economics.PREDECLARATION_SHA256)
 
+    def test_workflow_auto_dispatch_is_exact_parent_only(self):
+        workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-executable-economics.yml").read_text()
+        self.assertIn("github.event.workflow_run.id == 33291428414", workflow)
+        self.assertIn(
+            "github.event.workflow_run.head_sha == 'd313b7bd86b2bc7e59de0411d2625d4191412895'",
+            workflow,
+        )
+        self.assertIn("github.event.workflow_run.conclusion == 'success'", workflow)
+        self.assertLess(
+            workflow.index("Hard gate on exact passing OOS decision before price access"),
+            workflow.index("Acquire bounded public price and trade evidence"),
+        )
+
     def test_parent_gate_accepts_only_complete_passing_oos(self):
         with tempfile.TemporaryDirectory() as temporary:
             report_path, capture_path, report = passing_artifacts(Path(temporary))
