@@ -68,6 +68,15 @@ def passing_artifacts(root: Path):
 
 
 class ExecutableEconomicsTest(unittest.TestCase):
+    class FakeClient:
+        def __init__(self, payload):
+            self.payload = payload
+            self.urls = []
+
+        def fetch(self, url, _label):
+            self.urls.append(url)
+            return copy.deepcopy(self.payload)
+
     def test_frozen_boundaries_and_predeclaration(self):
         self.assertEqual(economics.OOS_RUN_ID, "33291428414")
         self.assertEqual((economics.START.isoformat(), economics.END.isoformat(), economics.DATE_COUNT), ("2024-03-16", "2024-11-20", 250))
@@ -124,6 +133,53 @@ class ExecutableEconomicsTest(unittest.TestCase):
             self.assertFalse(economics.quote_is_eligible(price, exact_score - Decimal("0.00000001")))
         self.assertFalse(economics.quote_is_eligible(Decimal("0.6999"), Decimal("1")))
         self.assertFalse(economics.quote_is_eligible(Decimal("0.9701"), Decimal("1")))
+
+    def test_candle_uses_current_close_dollars_and_rejects_legacy_only_field(self):
+        candidate = {
+            "station_id": "KATL", "market_date": "2024-03-16", "market_ticker": "TICKER",
+            "score": "0.950000", "outcome_no": 1,
+        }
+        instant = int(economics.decision_clock(date(2024, 3, 16)).timestamp())
+        current = self.FakeClient({
+            "ticker": "TICKER",
+            "candlesticks": [{"end_period_ts": instant, "yes_bid": {"close_dollars": "0.20"}}],
+        })
+        result = economics.capture_quote(current, "KXHIGHTATL", candidate)
+        self.assertTrue(result["candidate"])
+        self.assertEqual(result["no_price_proxy"], "0.80")
+
+        legacy = self.FakeClient({
+            "ticker": "TICKER",
+            "candlesticks": [{"end_period_ts": instant, "yes_bid": {"close": "0.20"}}],
+        })
+        result = economics.capture_quote(legacy, "KXHIGHTATL", candidate)
+        self.assertFalse(result["candidate"])
+        self.assertEqual(result["reason"], "missing_yes_bid_close_dollars")
+
+    def test_trade_proxy_excludes_blocks_and_requires_explicit_nonblock_identity(self):
+        selection = {
+            "station_id": "KATL", "market_date": "2024-03-16", "market_ticker": "TICKER",
+            "decision_at": "2024-03-15T20:05:00Z", "no_price_proxy": "0.80",
+        }
+        trade = {
+            "ticker": "TICKER", "trade_id": "trade-1", "created_time": "2024-03-15T20:06:00Z",
+            "taker_outcome_side": "no", "count_fp": "1.00", "no_price_dollars": "0.79",
+            "is_block_trade": False,
+        }
+        client = self.FakeClient({"trades": [trade], "cursor": ""})
+        result = economics.fetch_trade_proxy(client, selection, "2026-06-30T00:00:00Z")
+        self.assertEqual(result["trade_id"], "trade-1")
+        self.assertIn("is_block_trade=false", client.urls[0])
+
+        for invalid in (True, None):
+            malformed = copy.deepcopy(trade)
+            if invalid is None:
+                malformed.pop("is_block_trade")
+            else:
+                malformed["is_block_trade"] = invalid
+            client = self.FakeClient({"trades": [malformed], "cursor": ""})
+            with self.assertRaisesRegex(ValueError, "block identity"):
+                economics.fetch_trade_proxy(client, selection, "2026-06-30T00:00:00Z")
 
     def test_contract_scoring_floors_continuous_distance_conservatively(self):
         source = {"station_id": "KATL", "market_date": "2024-03-16", "forecast_high_f": "90.4", "observed_high_f": "94"}

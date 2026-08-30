@@ -36,7 +36,7 @@ NETWORK_LIMIT = 12_000
 BOOTSTRAP_SAMPLES = 10_000
 LCG_SEED = 0x48525234
 BASE_URL = "https://api.elections.kalshi.com/trade-api/v2"
-PREDECLARATION_SHA256 = "642f79877db1102f24d312ec4acbbb0ddf2d2efec75406665cc91538b9e4ff1a"
+PREDECLARATION_SHA256 = "d569eb2ce99f8bf30602ec50d3be08eb8f618cb94335d9e373c8110ec1b54fa5"
 BANDS = (
     ("0.900_0.925", Decimal("0.900"), Decimal("0.925")),
     ("0.925_0.950", Decimal("0.925"), Decimal("0.950")),
@@ -346,9 +346,9 @@ def capture_quote(client: PublicClient, series: str, candidate: dict) -> dict:
     if len(candles) != 1 or not isinstance(candles[0], dict) or candles[0].get("end_period_ts") != instant:
         raise ValueError(f"Candle clock identity is invalid for {ticker}")
     yes_bid = candles[0].get("yes_bid")
-    if not isinstance(yes_bid, dict) or yes_bid.get("close") is None:
-        return {**base, "candidate": False, "reason": "missing_yes_bid_close"}
-    bid = decimal(yes_bid["close"], "YES bid")
+    if not isinstance(yes_bid, dict) or yes_bid.get("close_dollars") is None:
+        return {**base, "candidate": False, "reason": "missing_yes_bid_close_dollars"}
+    bid = decimal(yes_bid["close_dollars"], "YES bid")
     if bid <= 0 or bid >= 1:
         return {**base, "candidate": False, "reason": "boundary_yes_bid", "yes_bid": str(bid)}
     price = Decimal(1) - bid
@@ -365,7 +365,7 @@ def fetch_trade_proxy(client: PublicClient, selection: dict, trade_cutoff: str) 
     if start >= timestamp(trade_cutoff, "trade cutoff"):
         raise ValueError("Frozen OOS trade must use the historical partition")
     end = start + dt.timedelta(minutes=5)
-    url = f"{BASE_URL}/historical/trades?" + urllib.parse.urlencode({"limit": "1000", "ticker": ticker, "min_ts": int(start.timestamp()), "max_ts": int(end.timestamp())})
+    url = f"{BASE_URL}/historical/trades?" + urllib.parse.urlencode({"limit": "1000", "ticker": ticker, "min_ts": int(start.timestamp()), "max_ts": int(end.timestamp()), "is_block_trade": "false"})
     payload = client.fetch(url, f"{selection['station_id']}-{selection['market_date']}-trades")
     trades = payload.get("trades")
     if not isinstance(trades, list) or payload.get("cursor") not in (None, ""):
@@ -374,6 +374,8 @@ def fetch_trade_proxy(client: PublicClient, selection: dict, trade_cutoff: str) 
     for trade in trades:
         if not isinstance(trade, dict) or trade.get("ticker") != ticker:
             raise ValueError(f"Trade ticker identity conflicts for {ticker}")
+        if trade.get("is_block_trade") is not False:
+            raise ValueError(f"Trade block identity is missing or invalid for {ticker}")
         created = timestamp(trade.get("created_time"), "trade time")
         if created < start or created >= end or trade.get("taker_outcome_side") != "no":
             continue

@@ -20,8 +20,9 @@ stops before a Kalshi client is created. There is no fallback run or threshold r
   integer floor strike. Provider result and frozen NOAA outcome must agree.
 - Contract distance is `floor + 0.5 - forecast_high`. It must be in `[4.0, 8.0)`. Its conservative score is the frozen
   station model at `floor(distance)`; only the predeclared integer buckets 4, 5, 6, and 7 exist.
-- The minute candle's closing YES bid is used only as an implied NO taker-price proxy, `1 - YES bid`. Missing, boundary,
-  non-cent, or ambiguous candles are not candidates. Historical candles do not prove displayed depth.
+- The minute candle's current `yes_bid.close_dollars` field is used only as an implied NO taker-price proxy,
+  `1 - YES bid`. The legacy `close` field is not admitted. Missing, boundary, non-cent, or ambiguous candles are not
+  candidates. Historical candles do not prove displayed depth.
 - Exact `$0.70` and `$0.97` pass; adjacent values outside the interval fail. Exact-fee conservative edge must be at
   least `$0.015`; equality passes. Fee is `ceil_0.0001(0.07 * price * (1-price))`, after exact series fee-history checks.
 - At most one row is selected per market date by higher conservative edge, then lower implied NO price, higher frozen
@@ -29,10 +30,12 @@ stops before a Kalshi client is created. There is no fallback run or threshold r
 
 ## Execution proxy and economic decisions
 
-A public NO-taker trade for at least one contract, priced no worse than the frozen limit during `[20:05,20:10)`, is a
-conservative public trade-through proxy. It is not a claim that Mimir would have filled and is never counted as
-provider-confirmed execution evidence. A selected submission without that proxy receives zero return. A supported
-selection receives exact-fee return `1-price-fee` on a NO win and `-price-fee` on a loss.
+A public non-block NO-taker trade for at least one contract, priced no worse than the frozen limit during
+`[20:05,20:10)`, is a conservative public trade-through proxy. Acquisition must request `is_block_trade=false`, and
+every returned row must explicitly contain `is_block_trade=false`; a missing or true value fails closed. It is not a
+claim that Mimir would have filled and is never counted as provider-confirmed execution evidence. A selected submission
+without that proxy receives zero return. A supported selection receives exact-fee return `1-price-fee` on a NO win and
+`-price-fee` on a loss.
 
 Initial economic evidence requires every item below:
 
