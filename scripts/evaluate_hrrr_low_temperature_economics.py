@@ -151,6 +151,20 @@ def paginated(client, path: str, fixed: dict[str, str], key: str, label: str, li
         cursor, page = next_cursor, page + 1
 
 
+def is_finalized_historical_market(market: dict) -> bool:
+    """Require the exact terminal REST identity returned for settled markets."""
+    ticker = market.get("ticker")
+    settlement_ts = market.get("settlement_ts")
+    return (
+        isinstance(ticker, str)
+        and bool(ticker)
+        and market.get("status") == "finalized"
+        and market.get("result") in ("yes", "no", "scalar")
+        and isinstance(settlement_ts, str)
+        and bool(settlement_ts)
+    )
+
+
 def load_provider_inventory(client) -> tuple[dict[str, dict], dict[str, list[dict]], list[dict]]:
     events: dict[str, dict] = {}
     markets: dict[str, list[dict]] = defaultdict(list)
@@ -172,9 +186,8 @@ def load_provider_inventory(client) -> tuple[dict[str, dict], dict[str, list[dic
         market_rows = paginated(client, "historical/markets", {"series_ticker": series}, "markets", f"{series}-markets", MARKET_PAGE_LIMIT)
         for market in market_rows:
             event = market.get("event_ticker")
-            ticker = market.get("ticker")
             if event in expected_events:
-                if not isinstance(ticker, str) or market.get("status") != "settled":
+                if not is_finalized_historical_market(market):
                     raise ValueError(f"Historical market identity is malformed for {event}")
                 markets[event].append(market)
     return events, markets, fees

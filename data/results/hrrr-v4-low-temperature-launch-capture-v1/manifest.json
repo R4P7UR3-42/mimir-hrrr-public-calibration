@@ -1,0 +1,20 @@
+{
+  "schema": "hrrr_v4_low_temperature_launch_capture_seal_v1",
+  "source_repository": "R4P7UR3-42/mimir-hrrr-public-calibration",
+  "source_run_id": 33320248649,
+  "source_job_id": 99280833347,
+  "source_head_sha": "626731a010954e78257885ac80264e56265b762a",
+  "source_acquisition_step_conclusion": "success",
+  "source_acquisition_completed_at": "2026-08-30T16:59:02Z",
+  "archive": "capture.tar.gz",
+  "archive_sha256": "c9a33ade0434da99e87353b3d85f4ee1dcf931be72b0490d1469a726f9870c7f",
+  "capture_json_sha256": "42e47d05831e816bf51c9ffb06aa7eb7d15d525c198fe14f297e592d5db5e3f8",
+  "ncei_tmin_sha256": "192e2755884f1923d49f758a27208ff2de1500c9d759daf21bdda2187a4a4bb8",
+  "noaa_isd_history_sha256": "1994747ab4af1b97e63adb434b4d0d022f2daee76f0c144ea9ab46be2d906604",
+  "stations_sha256": "e423c9c688b55a4797b936402e5ed096bac6d6fb73f743f2b175d0efc854d7d3",
+  "independent_market_dates": 112,
+  "complete_station_dates": 2240,
+  "network_requests": 2018,
+  "provider_outcomes_evaluated_before_seal": false,
+  "active_trading_capability_changed": false
+}

@@ -42,8 +42,11 @@ class LowTemperatureLaunchEconomicsTest(unittest.TestCase):
     def test_public_workflow_is_free_and_isolated(self):
         workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-launch-economics.yml").read_text()
         self.assertIn('run-id: "33319871449"', workflow)
+        self.assertIn("source_run_id == 33320248649", workflow)
+        self.assertIn("capture.tar.gz", workflow)
         self.assertIn("runs-on: ubuntu-latest", workflow)
         self.assertIn("--max-requests 10000", workflow)
+        self.assertNotIn("mimir-hrrr-capture-55e66973 --", workflow)
         self.assertNotIn("self-hosted", workflow)
         self.assertNotIn("secrets.", workflow)
         self.assertNotIn("portfolio", workflow)
