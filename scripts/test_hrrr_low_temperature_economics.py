@@ -57,13 +57,8 @@ class LowTemperatureEconomicsTest(unittest.TestCase):
             self.assertEqual(len(models), 80)
 
     def test_public_workflow_is_isolated_and_one_shot(self):
-        workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-economics.yml").read_text()
-        self.assertIn('run-id: "33300096256"', workflow)
-        self.assertIn("runs-on: ubuntu-latest", workflow)
-        self.assertIn("--max-requests 15000", workflow)
-        self.assertNotIn("self-hosted", workflow)
-        self.assertNotIn("secrets.", workflow)
-        self.assertNotIn("portfolio", workflow)
+        workflow = MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-economics.yml"
+        self.assertFalse(workflow.exists(), "consumed zero-support workflow must remain retired")
 
 
 if __name__ == "__main__":
