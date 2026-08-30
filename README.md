@@ -32,3 +32,15 @@ clustered-95 lower calibration margin `+0.015468`, and worst station holdout `+0
 support only. The sole independent OOS window is the immediately later 250 dates from `2024-03-16` through
 `2024-11-20`. A failure rejects this successor without tuning. Even a pass permits only a separate executable-price,
 exact-fee, depth, and fill audit; it creates no production or trading authority.
+
+## Hard-gated executable economics
+
+`ECONOMICS_PREDECLARATION.md` freezes a single public-price audit before price inspection. Its workflow restores only
+untouched OOS run `33291428414`, validates every calibration gate offline, and does not construct the Kalshi client if
+that identity fails. A passing parent may then be evaluated at the fixed 20:05 UTC quote clock with the frozen
+`$0.70`–`$0.97` price interval, exact quadratic fees, `$0.015` edge floor, one selection per date, whole-date clustered
+returns, station holdouts, concentration, and drawdown limits.
+
+Historical minute candles have no displayed-depth proof. The audit therefore labels a qualifying later public trade as
+a trade-through proxy, assigns zero return when that proxy is absent, and never calls it a provider-confirmed fill.
+Even positive initial or scale research evidence cannot authorize capital, deployment, recommendations, or orders.
