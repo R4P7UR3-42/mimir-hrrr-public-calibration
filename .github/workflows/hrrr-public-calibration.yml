@@ -19,6 +19,9 @@ permissions:
   contents: read
   actions: read
 
+env:
+  TMPDIR: /var/tmp
+
 concurrency:
   group: isolated-public-hrrrv4-${{ inputs.mode }}
   cancel-in-progress: false
@@ -71,9 +74,9 @@ jobs:
         if: inputs.mode == 'training'
         run: |
           umask 077
-          mkdir -p /tmp/mimir-hrrr-public
-          tar -xzf assets/mimir-hrrr-training-33161389066-partial.tar.gz -C /tmp/mimir-hrrr-public
-          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          mkdir -p /var/tmp/mimir-hrrr-public
+          tar -xzf assets/mimir-hrrr-training-33161389066-partial.tar.gz -C /var/tmp/mimir-hrrr-public
+          root=/var/tmp/mimir-hrrr-public/mimir-hrrr-archive
           jq -e '.schema == "hrrr_v4_archive_run_v1" and .run_id == "33161389066" and .head_sha == "78613606318b4130df07c3838fd4ba993e0593f6" and .mode == "training"' "$root/run.json" >/dev/null
           mv "$root/run.json" "$root/private-resume-source.json"
       - name: Restore exact public training result
@@ -81,7 +84,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: hrrrv4-public-training-${{ inputs.training_run_id }}
-          path: /tmp/mimir-hrrr-training
+          path: /var/tmp/mimir-hrrr-training
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ inputs.training_run_id }}
@@ -89,7 +92,7 @@ jobs:
       - name: Validate exact public training result
         if: inputs.mode == 'evaluation'
         run: |
-          root=/tmp/mimir-hrrr-training/mimir-hrrr-archive
+          root=/var/tmp/mimir-hrrr-training/mimir-hrrr-archive
           jq -e '.schema == "hrrr_v4_public_runner_run_v1" and .mode == "training"' "$root/run.json" >/dev/null
           cd "$root"
           sha256sum -c SHA256SUMS
@@ -99,7 +102,7 @@ jobs:
           TRAINING_RUN_ID: ${{ inputs.training_run_id }}
         run: |
           umask 077
-          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          root=/var/tmp/mimir-hrrr-public/mimir-hrrr-archive
           mkdir -p "$root"
           jq -n \
             --arg run_id "$GITHUB_RUN_ID" \
@@ -123,9 +126,9 @@ jobs:
           timeout --signal=TERM --kill-after=30s "$ACQUISITION_TIMEOUT" env -u LD_LIBRARY_PATH \
             ./assets/mimir-hrrr-capture-55e66973 -- \
               --start-date "$start" --end-date "$end" \
-              --output-dir /tmp/mimir-hrrr-public/mimir-hrrr-archive/capture \
+              --output-dir /var/tmp/mimir-hrrr-public/mimir-hrrr-archive/capture \
               --max-requests "$max_requests" --concurrency 4 >/dev/null
-          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+          root=/var/tmp/mimir-hrrr-public/mimir-hrrr-archive
           jq '{schema,request_policy,design,coverage}' "$root/capture/capture.json"
           cd "$root"
           sha256sum run.json capture/capture.json > SHA256SUMS
@@ -136,10 +139,10 @@ jobs:
         continue-on-error: true
         run: |
           ./assets/mimir-hrrr-evaluate-55e66973 -- \
-            --training /tmp/mimir-hrrr-training/mimir-hrrr-archive/capture/capture.json \
-            --evaluation /tmp/mimir-hrrr-public/mimir-hrrr-archive/capture/capture.json \
-            --output /tmp/mimir-hrrr-public/mimir-hrrr-archive/evaluation.json >/dev/null
-          root=/tmp/mimir-hrrr-public/mimir-hrrr-archive
+            --training /var/tmp/mimir-hrrr-training/mimir-hrrr-archive/capture/capture.json \
+            --evaluation /var/tmp/mimir-hrrr-public/mimir-hrrr-archive/capture/capture.json \
+            --output /var/tmp/mimir-hrrr-public/mimir-hrrr-archive/evaluation.json >/dev/null
+          root=/var/tmp/mimir-hrrr-public/mimir-hrrr-archive
           jq '{schema,design,evaluation}' "$root/evaluation.json"
           cd "$root"
           sha256sum run.json capture/capture.json evaluation.json > SHA256SUMS
@@ -149,7 +152,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: hrrrv4-public-${{ inputs.mode }}-${{ github.run_id }}
-          path: /tmp/mimir-hrrr-public
+          path: /var/tmp/mimir-hrrr-public
           if-no-files-found: error
           retention-days: 30
       - name: Preserve terminal acquisition or evaluation failure

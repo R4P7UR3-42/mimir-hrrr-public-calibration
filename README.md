@@ -3,6 +3,10 @@
 This repository is an isolated, credential-free research runner. It contains no provider credentials, production
 database, trading configuration, order capability, or production deployment path.
 
+Archive-scale workflow state uses `/var/tmp` with `TMPDIR` set to the same root. `/tmp` is intentionally excluded
+because it may be a capacity-limited RAM filesystem. Temporary workspace contents remain disposable and become
+evidence only through the existing uploaded-artifact and checksum boundaries.
+
 The two compressed executables are checksum-bound builds of the frozen private Mimir research source at
 `55e6697381aafef7acf535ca64f0100dc426ca57`. The partial training artifact contains only public NOAA weather data and
 324 complete dates from the predeclared 365-date training interval. Standard GitHub-hosted public runners resume the

@@ -12,6 +12,9 @@ permissions:
   contents: read
   actions: read
 
+env:
+  TMPDIR: /var/tmp
+
 concurrency:
   group: hrrr-executable-economics-v1
   cancel-in-progress: false
@@ -40,7 +43,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: hrrrv4-conservative-oos-33291428414
-          path: /tmp/mimir-hrrr-oos
+          path: /var/tmp/mimir-hrrr-oos
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: "33291428414"
@@ -48,27 +51,27 @@ jobs:
       - name: Hard gate on exact passing OOS decision before price access
         run: |
           python3 scripts/evaluate_hrrr_executable_economics.py \
-            --oos-report /tmp/mimir-hrrr-oos/evaluation.json \
-            --oos-capture /tmp/mimir-hrrr-oos/capture/capture.json \
+            --oos-report /var/tmp/mimir-hrrr-oos/evaluation.json \
+            --oos-capture /var/tmp/mimir-hrrr-oos/capture/capture.json \
             --verify-only
       - name: Acquire bounded public price and trade evidence
         run: |
           umask 077
-          mkdir -p /tmp/mimir-hrrr-economics
+          mkdir -p /var/tmp/mimir-hrrr-economics
           timeout --signal=TERM --kill-after=30s 270m \
             python3 scripts/evaluate_hrrr_executable_economics.py \
-              --oos-report /tmp/mimir-hrrr-oos/evaluation.json \
-              --oos-capture /tmp/mimir-hrrr-oos/capture/capture.json \
-              --output-dir /tmp/mimir-hrrr-economics \
+              --oos-report /var/tmp/mimir-hrrr-oos/evaluation.json \
+              --oos-capture /var/tmp/mimir-hrrr-oos/capture/capture.json \
+              --output-dir /var/tmp/mimir-hrrr-economics \
               --max-requests 12000
-          jq '{schema,parent_oos_run_id,support_funnel,evaluation:(.evaluation|del(.selections))}' /tmp/mimir-hrrr-economics/report.json
-          cd /tmp/mimir-hrrr-economics
+          jq '{schema,parent_oos_run_id,support_funnel,evaluation:(.evaluation|del(.selections))}' /var/tmp/mimir-hrrr-economics/report.json
+          cd /var/tmp/mimir-hrrr-economics
           sha256sum report.json > SHA256SUMS
       - name: Upload immutable economics artifact
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: hrrrv4-executable-economics-${{ github.run_id }}
-          path: /tmp/mimir-hrrr-economics
+          path: /var/tmp/mimir-hrrr-economics
           if-no-files-found: error
           retention-days: 30
