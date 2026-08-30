@@ -134,27 +134,27 @@ class ExecutableEconomicsTest(unittest.TestCase):
         self.assertFalse(economics.quote_is_eligible(Decimal("0.6999"), Decimal("1")))
         self.assertFalse(economics.quote_is_eligible(Decimal("0.9701"), Decimal("1")))
 
-    def test_candle_uses_current_close_dollars_and_rejects_legacy_only_field(self):
+    def test_candle_uses_historical_close_and_rejects_live_only_field(self):
         candidate = {
             "station_id": "KATL", "market_date": "2024-03-16", "market_ticker": "TICKER",
             "score": "0.950000", "outcome_no": 1,
         }
         instant = int(economics.decision_clock(date(2024, 3, 16)).timestamp())
-        current = self.FakeClient({
-            "ticker": "TICKER",
-            "candlesticks": [{"end_period_ts": instant, "yes_bid": {"close_dollars": "0.20"}}],
-        })
-        result = economics.capture_quote(current, "KXHIGHTATL", candidate)
-        self.assertTrue(result["candidate"])
-        self.assertEqual(result["no_price_proxy"], "0.80")
-
-        legacy = self.FakeClient({
+        historical = self.FakeClient({
             "ticker": "TICKER",
             "candlesticks": [{"end_period_ts": instant, "yes_bid": {"close": "0.20"}}],
         })
-        result = economics.capture_quote(legacy, "KXHIGHTATL", candidate)
+        result = economics.capture_quote(historical, "KXHIGHTATL", candidate)
+        self.assertTrue(result["candidate"])
+        self.assertEqual(result["no_price_proxy"], "0.80")
+
+        live_schema = self.FakeClient({
+            "ticker": "TICKER",
+            "candlesticks": [{"end_period_ts": instant, "yes_bid": {"close_dollars": "0.20"}}],
+        })
+        result = economics.capture_quote(live_schema, "KXHIGHTATL", candidate)
         self.assertFalse(result["candidate"])
-        self.assertEqual(result["reason"], "missing_yes_bid_close_dollars")
+        self.assertEqual(result["reason"], "missing_historical_yes_bid_close")
 
     def test_trade_proxy_excludes_blocks_and_requires_explicit_nonblock_identity(self):
         selection = {

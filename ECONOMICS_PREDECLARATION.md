@@ -20,9 +20,10 @@ stops before a Kalshi client is created. There is no fallback run or threshold r
   integer floor strike. Provider result and frozen NOAA outcome must agree.
 - Contract distance is `floor + 0.5 - forecast_high`. It must be in `[4.0, 8.0)`. Its conservative score is the frozen
   station model at `floor(distance)`; only the predeclared integer buckets 4, 5, 6, and 7 exist.
-- The minute candle's current `yes_bid.close_dollars` field is used only as an implied NO taker-price proxy,
-  `1 - YES bid`. The legacy `close` field is not admitted. Missing, boundary, non-cent, or ambiguous candles are not
-  candidates. Historical candles do not prove displayed depth.
+- The archived-market endpoint's documented `yes_bid.close` field is used only as an implied NO taker-price proxy,
+  `1 - YES bid`. The live-market endpoint's distinct `close_dollars` field is not admitted on this historical route.
+  Missing, boundary, non-cent, or ambiguous candles are not candidates. Historical candles do not prove displayed
+  depth.
 - Exact `$0.70` and `$0.97` pass; adjacent values outside the interval fail. Exact-fee conservative edge must be at
   least `$0.015`; equality passes. Fee is `ceil_0.0001(0.07 * price * (1-price))`, after exact series fee-history checks.
 - At most one row is selected per market date by higher conservative edge, then lower implied NO price, higher frozen
