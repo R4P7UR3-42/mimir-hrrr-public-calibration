@@ -104,6 +104,14 @@ Failure consumes the interval and stops the model. A pass can trigger only a
 separately pinned executable-economics review; it creates no adapter, policy,
 cohort, capital, recommendation, production deployment, or order authority.
 
+`REFIT_EXECUTABLE_ECONOMICS_PREDECLARATION.md` binds that possible review to
+exact calibration run `33307452119` and head `0620813…` before its result or
+any new-window prices are inspected. It preserves the prior quote clock, price,
+fee, edge, proxy, clustering, drawdown, concentration, and request boundaries.
+The public trade-through proxy remains neither displayed-depth proof nor a
+provider-confirmed Mimir fill, and even passing economics cannot authorize
+capital or production.
+
 ## Dependency-free current transport cross-check
 
 The one-time `Immutable current HRRR GRIB reference` workflow captures the exact
