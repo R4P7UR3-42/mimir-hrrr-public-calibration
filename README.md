@@ -14,3 +14,21 @@ both executable hashes, completed training-date range, and frozen untouched eval
 
 Passing this workflow is research evidence only. It cannot authorize a strategy, recommendation, capital, deployment,
 or order.
+
+## Conservative station successor
+
+The raw frozen HRRR station-Jeffreys model passed Brier skill and all reliability-band tolerances on its first 250-date
+evaluation, but its worst leave-one-station-out clustered-95 calibration margin was `-0.026046`. That entire period is
+now inspected development data.
+
+The single successor `hrrr_v4_station_jeffreys_minus_0035_v1` subtracts exactly `0.035` from every station/distance
+score: the predecessor deficit rounded up to the next `0.005`, plus one additional `0.005` buffer. It uses the existing
+Stage-1-aligned score floor `0.900`, fixed bands `[0.900,0.925)`, `[0.925,0.950)`, and `[0.950,1.000)`, at least eight
+selected stations, whole-date clustered bounds, concentration limits, positive Brier skill, and all 20 station
+holdouts. No score, station, distance, or band is tuned separately.
+
+Development replay retains 4,500 predictions across 11 stations and all 250 dates, positive Brier skill `0.117004`, a
+clustered-95 lower calibration margin `+0.015468`, and worst station holdout `+0.011970`. This is model-development
+support only. The sole independent OOS window is the immediately later 250 dates from `2024-03-16` through
+`2024-11-20`. A failure rejects this successor without tuning. Even a pass permits only a separate executable-price,
+exact-fee, depth, and fill audit; it creates no production or trading authority.
