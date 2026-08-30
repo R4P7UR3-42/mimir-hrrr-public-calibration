@@ -48,13 +48,11 @@ class LowTemperatureWilson90Test(unittest.TestCase):
         self.assertEqual(exclusions[0]["issues"], [{"reason": "missing_tmin", "station_id": "KBBB"}])
 
     def test_no_paid_or_private_dependency(self):
-        workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-wilson90.yml").read_text()
-        self.assertIn('run-id: "33300096256"', workflow)
-        self.assertIn("runs-on: ubuntu-latest", workflow)
-        self.assertNotIn("self-hosted", workflow)
-        self.assertNotIn("secrets.", workflow)
-        self.assertNotIn("external-api.kalshi.com", workflow)
-        self.assertNotIn("training-capture-root", workflow)
+        workflow = MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-wilson90.yml"
+        self.assertFalse(workflow.exists(), "consumed one-shot network workflow must remain retired")
+        source = MODULE_PATH.read_text()
+        self.assertNotIn("external-api.kalshi.com", source)
+        self.assertNotIn("secrets.", source)
 
 
 if __name__ == "__main__":

@@ -29,6 +29,10 @@ The consumed initial rejection is recorded in [`LOW_TEMPERATURE_INITIAL_RESULT.m
 The separately frozen Wilson-90 successor is defined in
 [`LOW_TEMPERATURE_WILSON90_PREDECLARATION.md`](LOW_TEMPERATURE_WILSON90_PREDECLARATION.md) and runs only on public hosted
 infrastructure with a free NOAA outcome source.
+Its consumed independent result is retained in
+[`LOW_TEMPERATURE_WILSON90_RESULT.md`](LOW_TEMPERATURE_WILSON90_RESULT.md), including the exact workflow-control defect
+that made the otherwise passing one-shot run appear red. The one-shot network workflow is removed after consumption so
+the frozen outcome window cannot be queried again and no GitHub Actions capacity is spent on a meaningless rerun.
 
 The daily-low family is materially distinct from the consumed daily-high residual experiments. The frozen
 `hrrr_v4_low_temperature_station_wilson95_v1` model derives the minimum of each parent capture's exact eight
