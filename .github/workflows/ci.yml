@@ -32,6 +32,7 @@ jobs:
       - run: python3 -m py_compile scripts/evaluate_hrrr_refit_economics.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature_wilson90.py
+      - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature_economics.py
       - run: python3 -m py_compile scripts/capture_hrrr_current_grib_reference.py
       - run: python3 -m unittest scripts/test_hrrr_conservative_successor.py
       - run: python3 -m unittest scripts/test_hrrr_executable_economics.py
@@ -41,6 +42,7 @@ jobs:
       - run: python3 -m unittest scripts/test_hrrr_refit_economics_workflow.py
       - run: python3 -m unittest scripts/test_hrrr_low_temperature.py
       - run: python3 -m unittest scripts/test_hrrr_low_temperature_wilson90.py
+      - run: python3 -m unittest scripts/test_hrrr_low_temperature_economics.py
       - name: Verify durable Wilson-90 result artifact
         run: |
           cd data/results/hrrr-v4-low-temperature-wilson90-v1
