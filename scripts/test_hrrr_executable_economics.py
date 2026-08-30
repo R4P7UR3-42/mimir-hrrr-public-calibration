@@ -169,6 +169,7 @@ class ExecutableEconomicsTest(unittest.TestCase):
         client = self.FakeClient({"trades": [trade], "cursor": ""})
         result = economics.fetch_trade_proxy(client, selection, "2026-06-30T00:00:00Z")
         self.assertEqual(result["trade_id"], "trade-1")
+        self.assertEqual(result["trade_no_price"], "0.79")
         self.assertIn("is_block_trade=false", client.urls[0])
 
         for invalid in (True, None):
@@ -180,6 +181,20 @@ class ExecutableEconomicsTest(unittest.TestCase):
             client = self.FakeClient({"trades": [malformed], "cursor": ""})
             with self.assertRaisesRegex(ValueError, "block identity"):
                 economics.fetch_trade_proxy(client, selection, "2026-06-30T00:00:00Z")
+
+    def test_supported_submission_uses_frozen_limit_not_better_trade_price(self):
+        winning = {"no_price_proxy": "0.80", "outcome_no": 1}
+        proxy = {"trade_no_price": "0.70"}
+        self.assertEqual(
+            economics.supported_submission_return(winning, proxy),
+            Decimal("1") - Decimal("0.80") - economics.fee(Decimal("0.80")),
+        )
+        losing = {"no_price_proxy": "0.80", "outcome_no": 0}
+        self.assertEqual(
+            economics.supported_submission_return(losing, proxy),
+            -Decimal("0.80") - economics.fee(Decimal("0.80")),
+        )
+        self.assertEqual(economics.supported_submission_return(winning, None), Decimal("0"))
 
     def test_contract_scoring_floors_continuous_distance_conservatively(self):
         source = {"station_id": "KATL", "market_date": "2024-03-16", "forecast_high_f": "90.4", "observed_high_f": "94"}

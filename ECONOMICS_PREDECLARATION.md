@@ -35,8 +35,9 @@ A public non-block NO-taker trade for at least one contract, priced no worse tha
 `[20:05,20:10)`, is a conservative public trade-through proxy. Acquisition must request `is_block_trade=false`, and
 every returned row must explicitly contain `is_block_trade=false`; a missing or true value fails closed. It is not a
 claim that Mimir would have filled and is never counted as provider-confirmed execution evidence. A selected submission
-without that proxy receives zero return. A supported selection receives exact-fee return `1-price-fee` on a NO win and
-`-price-fee` on a loss.
+without that proxy receives zero return. A supported selection is valued at the frozen decision limit and its exact fee,
+never a more favorable observed trade price: return is `1-limit-fee(limit)` on a NO win and `-limit-fee(limit)` on a
+loss.
 
 Initial economic evidence requires every item below:
 
