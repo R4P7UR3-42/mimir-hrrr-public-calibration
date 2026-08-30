@@ -23,6 +23,19 @@ training-date range, and frozen untouched evaluation range.
 Passing this workflow is research evidence only. It cannot authorize a strategy,
 recommendation, capital, deployment, or order.
 
+## Frozen low-temperature successor
+
+The daily-low family is materially distinct from the consumed daily-high residual experiments. The frozen
+`hrrr_v4_low_temperature_station_wilson95_v1` model derives the minimum of each parent capture's exact eight
+native-three-hour HRRRv4 points, fits only on 250 previously uninspected TMIN training dates, and evaluates exactly 250
+later untouched dates. It uses one-sided station Wilson95 lower scores at fixed 4–7°F distances and requires Brier,
+reliability, whole-date clustered, concentration, and all-station holdout gates.
+
+The workflow makes exactly two credential-free NOAA NCEI TMIN requests and does not access Kalshi prices. Even a pass
+permits only a separate frozen Weather Company settlement bridge and executable-economics audit; it creates no
+production model, strategy, cohort, capital, recommendation, or order authority. See
+`LOW_TEMPERATURE_PREDECLARATION.md`.
+
 ## Conservative station successor
 
 The raw frozen HRRR station-Jeffreys model passed Brier skill and all
