@@ -53,7 +53,7 @@ jobs:
         run: |
           umask 077
           python3 scripts/evaluate_hrrr_low_temperature.py \
-            --training-capture-root /var/tmp/mimir-low-temperature-training/capture \
+            --training-capture-root /var/tmp/mimir-low-temperature-training/mimir-hrrr-archive/capture \
             --evaluation-capture-root /var/tmp/mimir-low-temperature-evaluation/capture \
             --output-dir "$GITHUB_WORKSPACE/data/review-artifacts/mimir-hrrr-low-temperature"
           root="$GITHUB_WORKSPACE/data/review-artifacts/mimir-hrrr-low-temperature"
