@@ -34,14 +34,14 @@ jobs:
           seal="$GITHUB_WORKSPACE/data/results/hrrr-v4-low-temperature-launch-partial-cache-v1"
           cache=/var/tmp/mimir-low-temperature-sealed-inventory
           mkdir -p "$cache"
-          echo '569d2fb4535d42be3937d76d46ea44a85799e43d756f35523aeaab066ea9db4d  data/results/hrrr-v4-low-temperature-launch-partial-cache-v1/raw.tar.gz' | sha256sum -c
+          echo 'be3a949f9fad8a81c5bc0be5edb4630e04309a6ba74f713aa5eccad4574bfd9d  data/results/hrrr-v4-low-temperature-launch-partial-cache-v1/raw.tar.gz' | sha256sum -c
           jq -e '
-            .schema == "hrrr_v4_low_temperature_launch_partial_cache_seal_v1" and
-            .source_run_id == 33324290727 and
-            .source_head_sha == "57ca65566d1737344db5949ae8c0a8cad49b2871" and
-            .request_records == 201 and
-            .inherited_cache_hits == 95 and
-            .new_network_requests == 106 and
+            .schema == "hrrr_v4_low_temperature_launch_partial_cache_seal_v2" and
+            .source_run_id == 33324572976 and
+            .source_head_sha == "a12f6b86d174043fd829a9de33ba276c739f1ac5" and
+            .request_records == 907 and
+            .inherited_cache_hits == 201 and
+            .new_network_requests == 706 and
             .outcomes_scored_before_seal == false and
             .active_trading_capability_changed == false
           ' "$seal/manifest.json" >/dev/null
@@ -51,7 +51,7 @@ jobs:
         run: |
           cd /var/tmp/mimir-low-temperature-sealed-inventory
           echo '41f2c19984ec09c50eebc0fd4da3906333314d69988a2ea1f8f29a5751d0e1c9  report.json' | sha256sum -c
-          test "$(find raw -name '*.request.json' | wc -l)" -eq 201
+          test "$(find raw -name '*.request.json' | wc -l)" -eq 907
       - name: Restore exact sealed launch-window capture
         id: acquisition
         continue-on-error: true

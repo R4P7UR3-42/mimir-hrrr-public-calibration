@@ -110,6 +110,14 @@ def terminal_scalar_exclusion(source: dict, event_ticker: str, market: dict) -> 
     }
 
 
+def missing_lower_outer_exclusion(source: dict, event_ticker: str) -> dict:
+    return {
+        "station_id": source["station_id"], "market_date": source["market_date"],
+        "event_ticker": event_ticker, "market_ticker": None,
+        "reason": "missing_lower_outer_contract_is_not_executable_evidence",
+    }
+
+
 def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) -> dict:
     if prior.econ.file_sha256(ROOT / "LOW_TEMPERATURE_LAUNCH_ECONOMICS_PREDECLARATION.md") != PREDECLARATION_SHA256:
         raise ValueError("Launch-window predeclaration checksum is invalid")
@@ -122,10 +130,11 @@ def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) ->
     prior.low.EVALUATION = WINDOW
     events, markets, fees = prior.load_provider_inventory(client)
     cutoffs = prior.econ.historical_cutoffs(client)
-    quote_rows, bridge_rows, scalar_exclusions, by_date = [], [], [], defaultdict(list)
+    quote_rows, bridge_rows, scalar_exclusions, market_structure_exclusions, by_date = [], [], [], [], defaultdict(list)
     funnel = {
         "complete_station_dates": len(rows), "matched_events": 0,
-        "scalar_settlement_exclusions": 0, "scored_contracts": 0, "eligible_quotes": 0,
+        "scalar_settlement_exclusions": 0, "missing_lower_outer_exclusions": 0,
+        "scored_contracts": 0, "eligible_quotes": 0,
     }
     model_map = {
         (row["station_id"], row["distance_f"]): prior.econ.decimal(row["wilson90_lower_score"], "score")
@@ -139,8 +148,12 @@ def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) ->
             continue
         supported, source_kind = prior.source_supported(source["station_id"], event.get("settlement_sources"))
         lower = [market for market in markets.get(event_ticker, []) if market.get("strike_type") == "less"]
-        if len(lower) != 1:
-            raise ValueError(f"Launch event lacks exactly one lower outer contract: {event_ticker}")
+        if not lower:
+            market_structure_exclusions.append(missing_lower_outer_exclusion(source, event_ticker))
+            funnel["missing_lower_outer_exclusions"] += 1
+            continue
+        if len(lower) > 1:
+            raise ValueError(f"Launch event has duplicate lower outer contracts: {event_ticker}")
         scalar_exclusion = terminal_scalar_exclusion(source, event_ticker, lower[0])
         if scalar_exclusion is not None:
             scalar_exclusions.append(scalar_exclusion)
@@ -198,6 +211,7 @@ def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) ->
         "network_policy": {"maximum_new_economics_requests": NETWORK_LIMIT, "actual_new_economics_requests": client.used, "inventory_cache_hits": client.cache_hits, "ncei_requests": 1, "no_retry": True, "stop_on_http_429": True},
         "fee_identities": fees, "historical_cutoffs": cutoffs, "support_funnel": funnel,
         "scalar_settlement_exclusions": scalar_exclusions,
+        "market_structure_exclusions": market_structure_exclusions,
         "settlement_bridge_rows": bridge_rows, "quote_rows": quote_rows, "evaluation": evaluation,
     }
     prior.econ.atomic_json(output_dir / "report.json", report)
