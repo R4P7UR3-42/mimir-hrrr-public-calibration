@@ -49,6 +49,31 @@ class LowTemperatureEconomicsTest(unittest.TestCase):
         self.assertEqual(audit.source_supported("KNYC", wrong)[0], False)
         self.assertEqual(audit.source_supported("KNYC", [audit.TWC_SOURCE, audit.TWC_SOURCE])[0], False)
 
+    def test_historical_market_requires_exact_finalized_rest_identity(self):
+        market = {
+            "ticker": "KXLOWTATL-26JUN29-T71",
+            "status": "finalized",
+            "result": "no",
+            "settlement_ts": "2026-06-30T11:33:22.151653Z",
+        }
+        self.assertTrue(audit.is_finalized_historical_market(market))
+        self.assertTrue(audit.is_finalized_historical_market({**market, "result": "scalar"}))
+        for field, adjacent in (
+            ("status", "settled"),
+            ("status", "determined"),
+            ("result", ""),
+            ("settlement_ts", ""),
+            ("ticker", ""),
+        ):
+            malformed = {**market, field: adjacent}
+            self.assertFalse(audit.is_finalized_historical_market(malformed), (field, adjacent))
+
+    def test_selected_scalar_lower_contract_still_fails_closed(self):
+        models = {("KNYC", distance): Decimal("0.95") for distance in (4, 5, 6, 7)}
+        source = {"station_id": "KNYC", "market_date": "2025-01-01", "forecast_min_f": Decimal("63.5"), "observed_min_f": Decimal("60")}
+        with self.assertRaisesRegex(ValueError, "Exact lower-outer market identity is invalid"):
+            audit.score_lower_contract(source, self.market(result="scalar"), models)
+
     def test_parent_verifies_without_network(self):
         capture = Path("/var/tmp/mimir-hrrr-later-failed-33300096256/artifact/capture")
         if capture.exists():
