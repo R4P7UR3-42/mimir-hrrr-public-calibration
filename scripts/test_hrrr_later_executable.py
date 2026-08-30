@@ -175,20 +175,10 @@ class LaterExecutableTest(unittest.TestCase):
                     )
                 self.assertEqual(constructed, [])
 
-    def test_workflow_separates_weather_gate_from_price_access(self):
+    def test_consumed_later_workflows_are_retired(self):
         root = MODULE_PATH.parents[1]
-        weather = (root / ".github/workflows/hrrr-later-executable-calibration.yml").read_text()
-        price = (root / ".github/workflows/hrrr-later-executable-economics.yml").read_text()
-        self.assertNotIn("api.elections.kalshi.com", weather)
-        self.assertIn("--start-date 2024-11-21 --end-date 2025-07-28", weather)
-        self.assertIn("$GITHUB_WORKSPACE/data/review-artifacts/mimir-hrrr-later", weather)
-        self.assertNotIn("--output-dir /tmp/", weather)
-        self.assertIn("available >= 5 * 1024 * 1024 * 1024", weather)
-        self.assertIn("workflows:\n      - Later-window frozen HRRRv4 calibration", price)
-        self.assertLess(price.index("Hard gate exact later calibration before price access"), price.index("Acquire bounded public price and trade evidence"))
-        self.assertIn("github.event.workflow_run.id == 33300096256", price)
-        self.assertIn("github.event.workflow_run.head_sha == '58f8881a86c63c932b6731f6330ad13eafd15694'", price)
-        self.assertIn("github.event.workflow_run.head_branch == 'main'", price)
+        self.assertFalse((root / ".github/workflows/hrrr-later-executable-calibration.yml").exists())
+        self.assertFalse((root / ".github/workflows/hrrr-later-executable-economics.yml").exists())
 
 
 if __name__ == "__main__":

@@ -112,24 +112,9 @@ class HrrrRefitSuccessorTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "climatology counts"):
             refit.model_maps(malformed)
 
-    def test_untouched_workflow_is_weather_only_hard_gated_and_non_authorizing(self):
-        workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-refit-untouched-calibration.yml").read_text()
-        self.assertNotIn("api.elections.kalshi.com", workflow)
-        self.assertNotIn("external-api.kalshi.com", workflow)
-        self.assertIn("--start-date 2025-07-29 --end-date 2026-04-04", workflow)
-        self.assertIn(refit.MODEL_ARTIFACT_SHA256, workflow)
-        self.assertIn(refit.PREDECLARATION_SHA256, workflow)
-        self.assertIn('run-id: "33291428414"', workflow)
-        self.assertIn('run-id: "33300096256"', workflow)
-        self.assertIn(".evaluation.diagnostic_decision.passes == true", workflow)
-        self.assertIn("hrrr_v4_station_jeffreys_615_untouched_run_v1", workflow)
-        self.assertIn("sha256sum run.json capture/capture.json evaluation.json", workflow)
-        self.assertIn("active_trading_capability_changed == false", workflow)
-        self.assertIn("automatic_production_activation == false", workflow)
-        self.assertIn("provider_confirmed_fill_evidence == false", workflow)
-        self.assertIn("capital_risk_authority == false", workflow)
-        self.assertIn("production_activation == false", workflow)
-        self.assertNotIn("--output-dir /tmp/", workflow)
+    def test_consumed_untouched_workflow_is_retired(self):
+        workflow = MODULE_PATH.parents[1] / ".github/workflows/hrrr-refit-untouched-calibration.yml"
+        self.assertFalse(workflow.exists())
 
 
 if __name__ == "__main__":
