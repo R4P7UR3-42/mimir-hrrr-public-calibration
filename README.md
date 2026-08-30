@@ -52,3 +52,10 @@ negative model decision cannot reach the price step.
 Historical minute candles have no displayed-depth proof. The audit therefore labels a qualifying later public trade as
 a trade-through proxy, assigns zero return when that proxy is absent, and never calls it a provider-confirmed fill.
 Even positive initial or scale research evidence cannot authorize capital, deployment, recommendations, or orders.
+
+The first economics run was structurally underpowered rather than economically negative: broad Kalshi daily-high
+inventory existed on only 28 dates near the end of its 250-day weather window. `LATER_EXECUTABLE_PREDECLARATION.md`
+therefore freezes one later 250-date validation from `2024-11-21` through `2025-07-28` without changing the already
+passing model or any price, fee, edge, proxy, clustering, drawdown, or concentration boundary. A weather-only workflow
+must pass every frozen calibration gate before a separate automatically triggered workflow can access later-window
+prices. This successor remains research-only and non-authorizing.

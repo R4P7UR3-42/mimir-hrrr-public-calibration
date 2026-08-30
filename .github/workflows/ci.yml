@@ -18,5 +18,7 @@ jobs:
           python-version: "3.14"
       - run: python3 -m py_compile scripts/evaluate_hrrr_conservative_successor.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_executable_economics.py
+      - run: python3 -m py_compile scripts/evaluate_hrrr_later_executable.py
       - run: python3 -m unittest scripts/test_hrrr_conservative_successor.py
       - run: python3 -m unittest scripts/test_hrrr_executable_economics.py
+      - run: python3 -m unittest scripts/test_hrrr_later_executable.py
