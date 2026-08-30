@@ -35,6 +35,9 @@ that made the otherwise passing one-shot run appear red. The one-shot network wo
 the frozen outcome window cannot be queried again and no GitHub Actions capacity is spent on a meaningless rerun.
 The separately frozen settlement and historical execution-proxy decision is defined in
 [`LOW_TEMPERATURE_ECONOMICS_PREDECLARATION.md`](LOW_TEMPERATURE_ECONOMICS_PREDECLARATION.md).
+Its zero-market-support result is recorded in
+[`LOW_TEMPERATURE_ECONOMICS_RESULT.md`](LOW_TEMPERATURE_ECONOMICS_RESULT.md). The fixed common-market successor is
+predeclared in [`LOW_TEMPERATURE_LAUNCH_ECONOMICS_PREDECLARATION.md`](LOW_TEMPERATURE_LAUNCH_ECONOMICS_PREDECLARATION.md).
 
 The daily-low family is materially distinct from the consumed daily-high residual experiments. The frozen
 `hrrr_v4_low_temperature_station_wilson95_v1` model derives the minimum of each parent capture's exact eight

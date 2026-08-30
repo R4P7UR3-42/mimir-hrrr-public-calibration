@@ -1,0 +1,116 @@
+name: Frozen low-temperature launch-window economics
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  TMPDIR: /var/tmp
+
+concurrency:
+  group: hrrr-low-temperature-launch-economics-v1
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+      - name: Verify exact source and protocol
+        run: |
+          python3 -m py_compile scripts/evaluate_hrrr_low_temperature_launch_economics.py
+          python3 -m unittest scripts/test_hrrr_low_temperature_launch_economics.py
+          echo 'dbc3231320b13240fd2e42fc5047c58a446247c28ba8ce624d518dc28e5fc163  LOW_TEMPERATURE_LAUNCH_ECONOMICS_PREDECLARATION.md' | sha256sum -c
+          cd assets
+          sha256sum -c SHA256SUMS
+          xz --decompress --keep mimir-hrrr-capture-55e66973.xz mimir-hrrr-evaluate-55e66973.xz
+          chmod 0555 mimir-hrrr-capture-55e66973 mimir-hrrr-evaluate-55e66973
+          sha256sum -c EXECUTABLE_SHA256SUMS
+      - name: Restore sealed provider inventory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: hrrrv4-low-temperature-economics-33319871449
+          path: /var/tmp/mimir-low-temperature-sealed-inventory
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: "33319871449"
+          digest-mismatch: error
+      - name: Verify sealed provider inventory
+        run: |
+          cd /var/tmp/mimir-low-temperature-sealed-inventory
+          sha256sum -c SHA256SUMS
+          echo '41f2c19984ec09c50eebc0fd4da3906333314d69988a2ea1f8f29a5751d0e1c9  report.json' | sha256sum -c
+      - name: Install pinned ecCodes decoder
+        run: |
+          python3 -m pip install --disable-pip-version-check -r scripts/requirements-ecmwf-open-data.txt
+          env -u LD_LIBRARY_PATH python3 -c 'import eccodes; assert eccodes.codes_get_api_version() == "2.48.0"'
+      - name: Acquire exact causal launch-window HRRR
+        id: acquisition
+        continue-on-error: true
+        run: |
+          umask 077
+          root="$GITHUB_WORKSPACE/data/review-artifacts/mimir-low-temperature-launch"
+          mkdir -p "$root"
+          timeout --signal=TERM --kill-after=30s 330m env -u LD_LIBRARY_PATH \
+            ./assets/mimir-hrrr-capture-55e66973 -- \
+              --start-date 2026-04-03 --end-date 2026-07-23 \
+              --output-dir "$root/capture" \
+              --max-requests 2500 --concurrency 4 >/dev/null
+          jq -e '
+            .schema == "hrrr_v4_archive_calibration_capture_v1" and
+            .design.start_market_date == "2026-04-03" and
+            .design.end_market_date == "2026-07-23" and
+            .coverage.independent_market_dates == 112 and
+            .coverage.complete_station_dates == 2240 and
+            .coverage.complete == true
+          ' "$root/capture/capture.json" >/dev/null
+      - name: Evaluate blinded settlement and economics once
+        id: evaluation
+        if: steps.acquisition.outcome == 'success'
+        continue-on-error: true
+        run: |
+          umask 077
+          root="$GITHUB_WORKSPACE/data/review-artifacts/mimir-low-temperature-launch"
+          python3 scripts/evaluate_hrrr_low_temperature_launch_economics.py \
+            --capture-root "$root/capture" \
+            --inventory-cache-root /var/tmp/mimir-low-temperature-sealed-inventory \
+            --output-dir "$root/economics" \
+            --max-requests 10000
+          jq -e '
+            .schema == "hrrr_v4_low_temperature_wilson90_launch_executable_economics_v1" and
+            .research_only == true and
+            .historical_depth_known == false and
+            .public_trade_proxy_is_provider_confirmed_fill == false and
+            .capital_risk_authority == false and
+            .production_activation == false and
+            .active_trading_capability_changed == false and
+            .automatic_production_activation == false and
+            .window_weather.complete_dates >= 110 and
+            .evaluation.settlement_bridge_passes == true and
+            .evaluation.initial_economic_evidence_passes == true and
+            .evaluation.scale_research_evidence_passes == false
+          ' "$root/economics/report.json" >/dev/null
+          (
+            cd "$root"
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+            sha256sum -c SHA256SUMS
+          )
+      - name: Upload checksum-bound launch evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hrrrv4-low-temperature-launch-${{ github.run_id }}
+          path: ${{ github.workspace }}/data/review-artifacts/mimir-low-temperature-launch
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve terminal launch audit failure
+        if: always() && (steps.acquisition.outcome != 'success' || steps.evaluation.outcome != 'success')
+        run: exit 1

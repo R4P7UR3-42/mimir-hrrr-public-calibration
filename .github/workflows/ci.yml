@@ -33,6 +33,7 @@ jobs:
       - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature_wilson90.py
       - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature_economics.py
+      - run: python3 -m py_compile scripts/evaluate_hrrr_low_temperature_launch_economics.py
       - run: python3 -m py_compile scripts/capture_hrrr_current_grib_reference.py
       - run: python3 -m unittest scripts/test_hrrr_conservative_successor.py
       - run: python3 -m unittest scripts/test_hrrr_executable_economics.py
@@ -43,6 +44,7 @@ jobs:
       - run: python3 -m unittest scripts/test_hrrr_low_temperature.py
       - run: python3 -m unittest scripts/test_hrrr_low_temperature_wilson90.py
       - run: python3 -m unittest scripts/test_hrrr_low_temperature_economics.py
+      - run: python3 -m unittest scripts/test_hrrr_low_temperature_launch_economics.py
       - name: Verify durable Wilson-90 result artifact
         run: |
           cd data/results/hrrr-v4-low-temperature-wilson90-v1
@@ -56,6 +58,17 @@ jobs:
             .active_trading_capability_changed == false and
             .automatic_production_activation == false
           ' evaluation.json >/dev/null
+      - name: Verify durable zero-support economics result
+        run: |
+          cd data/results/hrrr-v4-low-temperature-economics-v1
+          sha256sum -c SHA256SUMS
+          jq -e '
+            .schema == "hrrr_v4_low_temperature_wilson90_executable_economics_v1" and
+            .support_funnel.matched_events == 0 and
+            .support_funnel.scored_contracts == 0 and
+            .evaluation.initial_economic_evidence_passes == false and
+            .active_trading_capability_changed == false
+          ' report.json >/dev/null
       - run: python3 -m unittest scripts/test_hrrr_current_grib_reference.py
       - run: deno fmt --check scripts/hrrr_zarr_transport.ts scripts/hrrr_zarr_transport_test.ts scripts/crosscheck_hrrr_zarr_transport.ts
       - run: deno check scripts/hrrr_zarr_transport.ts scripts/crosscheck_hrrr_zarr_transport.ts
