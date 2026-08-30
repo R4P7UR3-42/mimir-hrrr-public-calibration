@@ -50,6 +50,17 @@ class LowTemperatureLaunchEconomicsTest(unittest.TestCase):
         self.assertEqual(row["market_ticker"], market["ticker"])
         self.assertIsNone(launch.terminal_scalar_exclusion(source, "KXLOWTATL-26APR14", {**market, "result": "no"}))
 
+    def test_missing_lower_outer_is_explicitly_non_executable(self):
+        row = launch.missing_lower_outer_exclusion(
+            {"station_id": "KATL", "market_date": "2026-06-30"},
+            "KXLOWTATL-26JUN30",
+        )
+        self.assertIsNone(row["market_ticker"])
+        self.assertEqual(row["reason"], "missing_lower_outer_contract_is_not_executable_evidence")
+        source = MODULE_PATH.read_text()
+        self.assertIn('if len(lower) > 1:', source)
+        self.assertIn('duplicate lower outer contracts', source)
+
     def test_public_workflow_is_free_and_isolated(self):
         workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-launch-economics.yml").read_text()
         self.assertIn("hrrr-v4-low-temperature-launch-partial-cache-v1", workflow)
