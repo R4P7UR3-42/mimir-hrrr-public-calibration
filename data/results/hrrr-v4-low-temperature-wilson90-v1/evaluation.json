@@ -1,0 +1,831 @@
+{
+  "active_trading_capability_changed": false,
+  "automatic_production_activation": false,
+  "capital_risk_authority": false,
+  "design": {
+    "candidate_evaluation_dates": 250,
+    "distances_f": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "evaluation_end_market_date": "2025-07-28",
+    "evaluation_parent_run_id": "33300096256",
+    "evaluation_start_market_date": "2024-11-21",
+    "minimum_complete_evaluation_dates": 245,
+    "missing_source_policy": "exclude_entire_market_date_if_any_required_station_row_is_unavailable",
+    "model": "hrrr_v4_low_temperature_station_wilson90_v1",
+    "model_sha256": "3d052664250c2a0acbfb52d38ff94cfad57eafbcd619acae5d56d5515fd376f1",
+    "predeclaration_sha256": "f40753d6335fc1d9d3981558c0a580681afa2943bb1061119269ee074b510b75",
+    "score_floor": "0.900000",
+    "wilson_z": "1.2815515655446004"
+  },
+  "evaluation": {
+    "brier_score": "0.018731",
+    "brier_skill_versus_distance_training_climatology": "0.098125",
+    "candidate_evaluation_dates": 250,
+    "complete_evaluation_dates": 250,
+    "diagnostic_decision": {
+      "gates": {
+        "at_least_100_selected_dates": true,
+        "at_least_245_complete_evaluation_dates": true,
+        "at_least_8_selected_stations": true,
+        "date_clustered_90_margin_nonnegative": true,
+        "date_clustered_95_margin_nonnegative": true,
+        "date_concentration_at_most_0_05": true,
+        "every_reliability_band_passes": true,
+        "every_station_holdout_passes": true,
+        "exact_20_station_holdouts": true,
+        "exact_250_training_dates": true,
+        "exact_two_reliability_bands": true,
+        "only_whole_dates_evaluated": true,
+        "positive_brier_skill": true,
+        "station_concentration_at_most_0_35": true
+      },
+      "passes": true
+    },
+    "distance_training_climatology_brier_score": "0.020769",
+    "excluded_evaluation_dates": [],
+    "leave_one_station_out": [
+      {
+        "excluded_station_id": "KATL",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004088",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KAUS",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004237",
+        "passes": true,
+        "predictions": 15250
+      },
+      {
+        "excluded_station_id": "KBOS",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003626",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KDCA",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003781",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KDEN",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004237",
+        "passes": true,
+        "predictions": 15250
+      },
+      {
+        "excluded_station_id": "KDFW",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.006754",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KHOU",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004738",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KLAS",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003109",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KLAX",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004076",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KMDW",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004239",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KMIA",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004217",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KMSP",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004027",
+        "passes": true,
+        "predictions": 14750
+      },
+      {
+        "excluded_station_id": "KMSY",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003470",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KNYC",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003680",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KOKC",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004237",
+        "passes": true,
+        "predictions": 15250
+      },
+      {
+        "excluded_station_id": "KPHL",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004731",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KPHX",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003642",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KSAT",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004872",
+        "passes": true,
+        "predictions": 14250
+      },
+      {
+        "excluded_station_id": "KSEA",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.003568",
+        "passes": true,
+        "predictions": 14500
+      },
+      {
+        "excluded_station_id": "KSFO",
+        "independent_market_dates": 250,
+        "one_sided_95_date_clustered_lower_observed_minus_score": "0.004237",
+        "passes": true,
+        "predictions": 15250
+      }
+    ],
+    "maximum_date_share": "0.004000",
+    "maximum_station_share": "0.065574",
+    "mean_score": "0.972812",
+    "observed_minus_score": "0.007712",
+    "observed_success_rate": "0.980525",
+    "one_sided_90_date_clustered_lower_observed_minus_score": "0.005024",
+    "one_sided_95_date_clustered_lower_observed_minus_score": "0.004237",
+    "reliability": [
+      {
+        "absolute_error": "0.008658",
+        "band": "0.900_0.925",
+        "independent_market_dates": 250,
+        "mean_score": "0.917742",
+        "observed_success_rate": "0.926400",
+        "passes": true,
+        "predictions": 1250
+      },
+      {
+        "absolute_error": "0.007628",
+        "band": "0.925_1.000",
+        "independent_market_dates": 250,
+        "mean_score": "0.977729",
+        "observed_success_rate": "0.985357",
+        "passes": true,
+        "predictions": 14000
+      }
+    ],
+    "selected_independent_market_dates": 250,
+    "selected_predictions": 15250,
+    "selected_stations": 16,
+    "total_predictions": 20000
+  },
+  "executable_economics_evaluated": false,
+  "historical_price_data_inspected": false,
+  "limitations": [
+    "This is NOAA TMIN forecast calibration only, not Kalshi settlement, price, depth, fee, fill, or P&L evidence.",
+    "A pass permits only a separately frozen Weather Company settlement bridge and executable-economics audit.",
+    "No result creates deployment, policy, cohort, capital, recommendation, or order authority."
+  ],
+  "model_artifact": {
+    "active_trading_capability_changed": false,
+    "automatic_production_activation": false,
+    "distance_training_climatology": {
+      "4": "0.901800",
+      "5": "0.931600",
+      "6": "0.957000",
+      "7": "0.972000"
+    },
+    "distances_f": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "model": "hrrr_v4_low_temperature_station_wilson90_v1",
+    "research_only": true,
+    "schema": "hrrr_v4_low_temperature_station_wilson90_model_v1",
+    "score_floor": "0.900000",
+    "station_models": [
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KATL",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KATL",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KATL",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KATL",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KAUS",
+        "successes": 145,
+        "wilson90_lower_score": "0.539601"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KAUS",
+        "successes": 165,
+        "wilson90_lower_score": "0.620672"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KAUS",
+        "successes": 188,
+        "wilson90_lower_score": "0.715428"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KAUS",
+        "successes": 205,
+        "wilson90_lower_score": "0.786804"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KBOS",
+        "successes": 239,
+        "wilson90_lower_score": "0.936190"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KBOS",
+        "successes": 246,
+        "wilson90_lower_score": "0.970224"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KBOS",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KBOS",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KDCA",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KDCA",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KDCA",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KDCA",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KDEN",
+        "successes": 177,
+        "wilson90_lower_score": "0.669885"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KDEN",
+        "successes": 194,
+        "wilson90_lower_score": "0.740468"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KDEN",
+        "successes": 213,
+        "wilson90_lower_score": "0.820923"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KDEN",
+        "successes": 224,
+        "wilson90_lower_score": "0.868619"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KDFW",
+        "successes": 236,
+        "wilson90_lower_score": "0.922303"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KDFW",
+        "successes": 242,
+        "wilson90_lower_score": "0.950403"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KDFW",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KDFW",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KHOU",
+        "successes": 236,
+        "wilson90_lower_score": "0.922303"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KHOU",
+        "successes": 243,
+        "wilson90_lower_score": "0.955240"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KHOU",
+        "successes": 245,
+        "wilson90_lower_score": "0.965131"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KHOU",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KLAS",
+        "successes": 245,
+        "wilson90_lower_score": "0.965131"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KLAS",
+        "successes": 247,
+        "wilson90_lower_score": "0.975460"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KLAS",
+        "successes": 247,
+        "wilson90_lower_score": "0.975460"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KLAS",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KLAX",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KLAX",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KLAX",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KLAX",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KMDW",
+        "successes": 242,
+        "wilson90_lower_score": "0.950403"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KMDW",
+        "successes": 245,
+        "wilson90_lower_score": "0.965131"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KMDW",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KMDW",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KMIA",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KMIA",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KMIA",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KMIA",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KMSP",
+        "successes": 220,
+        "wilson90_lower_score": "0.851150"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KMSP",
+        "successes": 230,
+        "wilson90_lower_score": "0.895171"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KMSP",
+        "successes": 240,
+        "wilson90_lower_score": "0.940885"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KMSP",
+        "successes": 246,
+        "wilson90_lower_score": "0.970224"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KMSY",
+        "successes": 235,
+        "wilson90_lower_score": "0.917729"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KMSY",
+        "successes": 244,
+        "wilson90_lower_score": "0.960145"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KMSY",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KMSY",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KNYC",
+        "successes": 247,
+        "wilson90_lower_score": "0.975460"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KNYC",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KNYC",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KNYC",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KOKC",
+        "successes": 142,
+        "wilson90_lower_score": "0.527535"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KOKC",
+        "successes": 172,
+        "wilson90_lower_score": "0.649323"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KOKC",
+        "successes": 209,
+        "wilson90_lower_score": "0.803813"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KOKC",
+        "successes": 226,
+        "wilson90_lower_score": "0.877418"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KPHL",
+        "successes": 244,
+        "wilson90_lower_score": "0.960145"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KPHL",
+        "successes": 247,
+        "wilson90_lower_score": "0.975460"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KPHL",
+        "successes": 248,
+        "wilson90_lower_score": "0.980908"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KPHL",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KPHX",
+        "successes": 247,
+        "wilson90_lower_score": "0.975460"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KPHX",
+        "successes": 249,
+        "wilson90_lower_score": "0.986723"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KPHX",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KPHX",
+        "successes": 250,
+        "wilson90_lower_score": "0.993473"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KSAT",
+        "successes": 233,
+        "wilson90_lower_score": "0.908648"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KSAT",
+        "successes": 243,
+        "wilson90_lower_score": "0.955240"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KSAT",
+        "successes": 245,
+        "wilson90_lower_score": "0.965131"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KSAT",
+        "successes": 246,
+        "wilson90_lower_score": "0.970224"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KSEA",
+        "successes": 227,
+        "wilson90_lower_score": "0.881836"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KSEA",
+        "successes": 235,
+        "wilson90_lower_score": "0.917729"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KSEA",
+        "successes": 241,
+        "wilson90_lower_score": "0.945620"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KSEA",
+        "successes": 245,
+        "wilson90_lower_score": "0.965131"
+      },
+      {
+        "distance_f": 4,
+        "samples": 250,
+        "station_id": "KSFO",
+        "successes": 198,
+        "wilson90_lower_score": "0.757249"
+      },
+      {
+        "distance_f": 5,
+        "samples": 250,
+        "station_id": "KSFO",
+        "successes": 210,
+        "wilson90_lower_score": "0.808081"
+      },
+      {
+        "distance_f": 6,
+        "samples": 250,
+        "station_id": "KSFO",
+        "successes": 217,
+        "wilson90_lower_score": "0.838147"
+      },
+      {
+        "distance_f": 7,
+        "samples": 250,
+        "station_id": "KSFO",
+        "successes": 229,
+        "wilson90_lower_score": "0.890712"
+      }
+    ],
+    "training_end_market_date": "2024-03-15",
+    "training_independent_dates": 250,
+    "training_start_market_date": "2023-07-10",
+    "wilson_z": "1.2815515655446004"
+  },
+  "production_activation": false,
+  "provider_confirmed_fill_evidence": false,
+  "research_only": true,
+  "schema": "hrrr_v4_low_temperature_station_wilson90_evaluation_v1",
+  "source_evidence": {
+    "credential_required": false,
+    "evaluation_tmin_sha256": "dccb0fd65c41fd610eac7c4f9ee7c20cbe78f9beafa0e07b1540dfc5759ada7a",
+    "evaluation_tmin_url": "https://www.ncei.noaa.gov/access/services/data/v1?dataset=daily-summaries&stations=USW00013874%2CUSW00013904%2CUSW00014739%2CUSW00013743%2CUSW00003017%2CUSW00003927%2CUSW00012918%2CUSW00023169%2CUSW00023174%2CUSW00014819%2CUSW00012839%2CUSW00014922%2CUSW00012916%2CUSW00094728%2CUSW00013967%2CUSW00013739%2CUSW00023183%2CUSW00012921%2CUSW00024233%2CUSW00023234&startDate=2024-11-21&endDate=2025-07-28&format=json&units=standard&includeAttributes=true&dataTypes=TMIN",
+    "network_requests": 1,
+    "no_retry": true,
+    "paid_provider_required": false,
+    "stop_on_http_429": true
+  },
+  "weather_company_settlement_bridge_evaluated": false
+}
