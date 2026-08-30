@@ -36,7 +36,7 @@ NETWORK_LIMIT = 12_000
 BOOTSTRAP_SAMPLES = 10_000
 LCG_SEED = 0x48525234
 BASE_URL = "https://api.elections.kalshi.com/trade-api/v2"
-PREDECLARATION_SHA256 = "d569eb2ce99f8bf30602ec50d3be08eb8f618cb94335d9e373c8110ec1b54fa5"
+PREDECLARATION_SHA256 = "bb4dcf53b35677ce182e47d5c86240d5c6458d99e788fc57046e0df82f650aa7"
 BANDS = (
     ("0.900_0.925", Decimal("0.900"), Decimal("0.925")),
     ("0.925_0.950", Decimal("0.925"), Decimal("0.950")),
@@ -346,9 +346,9 @@ def capture_quote(client: PublicClient, series: str, candidate: dict) -> dict:
     if len(candles) != 1 or not isinstance(candles[0], dict) or candles[0].get("end_period_ts") != instant:
         raise ValueError(f"Candle clock identity is invalid for {ticker}")
     yes_bid = candles[0].get("yes_bid")
-    if not isinstance(yes_bid, dict) or yes_bid.get("close_dollars") is None:
-        return {**base, "candidate": False, "reason": "missing_yes_bid_close_dollars"}
-    bid = decimal(yes_bid["close_dollars"], "YES bid")
+    if not isinstance(yes_bid, dict) or yes_bid.get("close") is None:
+        return {**base, "candidate": False, "reason": "missing_historical_yes_bid_close"}
+    bid = decimal(yes_bid["close"], "YES bid")
     if bid <= 0 or bid >= 1:
         return {**base, "candidate": False, "reason": "boundary_yes_bid", "yes_bid": str(bid)}
     price = Decimal(1) - bid
