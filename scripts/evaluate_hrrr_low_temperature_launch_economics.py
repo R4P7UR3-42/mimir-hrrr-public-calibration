@@ -98,6 +98,18 @@ def load_window(capture_root: Path, output_dir: Path) -> tuple[list[dict], dict]
     }
 
 
+def terminal_scalar_exclusion(source: dict, event_ticker: str, market: dict) -> dict | None:
+    if market.get("result") != "scalar":
+        return None
+    return {
+        "station_id": source["station_id"], "market_date": source["market_date"],
+        "event_ticker": event_ticker, "market_ticker": market.get("ticker"),
+        "status": market.get("status"), "result": "scalar",
+        "settlement_ts": market.get("settlement_ts"),
+        "reason": "terminal_scalar_is_not_binary_outcome_evidence",
+    }
+
+
 def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) -> dict:
     if prior.econ.file_sha256(ROOT / "LOW_TEMPERATURE_LAUNCH_ECONOMICS_PREDECLARATION.md") != PREDECLARATION_SHA256:
         raise ValueError("Launch-window predeclaration checksum is invalid")
@@ -110,8 +122,11 @@ def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) ->
     prior.low.EVALUATION = WINDOW
     events, markets, fees = prior.load_provider_inventory(client)
     cutoffs = prior.econ.historical_cutoffs(client)
-    quote_rows, bridge_rows, by_date = [], [], defaultdict(list)
-    funnel = {"complete_station_dates": len(rows), "matched_events": 0, "scored_contracts": 0, "eligible_quotes": 0}
+    quote_rows, bridge_rows, scalar_exclusions, by_date = [], [], [], defaultdict(list)
+    funnel = {
+        "complete_station_dates": len(rows), "matched_events": 0,
+        "scalar_settlement_exclusions": 0, "scored_contracts": 0, "eligible_quotes": 0,
+    }
     model_map = {
         (row["station_id"], row["distance_f"]): prior.econ.decimal(row["wilson90_lower_score"], "score")
         for row in weather["model"]["station_models"]
@@ -126,6 +141,11 @@ def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) ->
         lower = [market for market in markets.get(event_ticker, []) if market.get("strike_type") == "less"]
         if len(lower) != 1:
             raise ValueError(f"Launch event lacks exactly one lower outer contract: {event_ticker}")
+        scalar_exclusion = terminal_scalar_exclusion(source, event_ticker, lower[0])
+        if scalar_exclusion is not None:
+            scalar_exclusions.append(scalar_exclusion)
+            funnel["scalar_settlement_exclusions"] += 1
+            continue
         funnel["matched_events"] += 1
         candidate = prior.score_lower_contract(source, lower[0], model_map)
         if candidate is None:
@@ -177,6 +197,7 @@ def run(capture_root: Path, cache_root: Path, output_dir: Path, maximum: int) ->
         "window_weather": weather,
         "network_policy": {"maximum_new_economics_requests": NETWORK_LIMIT, "actual_new_economics_requests": client.used, "inventory_cache_hits": client.cache_hits, "ncei_requests": 1, "no_retry": True, "stop_on_http_429": True},
         "fee_identities": fees, "historical_cutoffs": cutoffs, "support_funnel": funnel,
+        "scalar_settlement_exclusions": scalar_exclusions,
         "settlement_bridge_rows": bridge_rows, "quote_rows": quote_rows, "evaluation": evaluation,
     }
     prior.econ.atomic_json(output_dir / "report.json", report)

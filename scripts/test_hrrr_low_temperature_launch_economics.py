@@ -39,9 +39,20 @@ class LowTemperatureLaunchEconomicsTest(unittest.TestCase):
         result = MODULE_PATH.parents[1] / "data/results/hrrr-v4-low-temperature-economics-v1/report.json"
         self.assertEqual(launch.prior.econ.file_sha256(result), launch.INVENTORY_REPORT_SHA256)
 
+    def test_scalar_terminal_rows_are_explicitly_excluded_by_the_launch_consumer(self):
+        source = {"station_id": "KATL", "market_date": "2026-04-14"}
+        market = {
+            "ticker": "KXLOWTATL-26APR14-T54", "status": "finalized",
+            "result": "scalar", "settlement_ts": "2026-04-23T21:02:14.257579Z",
+        }
+        row = launch.terminal_scalar_exclusion(source, "KXLOWTATL-26APR14", market)
+        self.assertEqual(row["reason"], "terminal_scalar_is_not_binary_outcome_evidence")
+        self.assertEqual(row["market_ticker"], market["ticker"])
+        self.assertIsNone(launch.terminal_scalar_exclusion(source, "KXLOWTATL-26APR14", {**market, "result": "no"}))
+
     def test_public_workflow_is_free_and_isolated(self):
         workflow = (MODULE_PATH.parents[1] / ".github/workflows/hrrr-low-temperature-launch-economics.yml").read_text()
-        self.assertIn('run-id: "33319871449"', workflow)
+        self.assertIn("hrrr-v4-low-temperature-launch-partial-cache-v1", workflow)
         self.assertIn("source_run_id == 33320248649", workflow)
         self.assertIn("capture.tar.gz", workflow)
         self.assertIn("runs-on: ubuntu-latest", workflow)
@@ -50,6 +61,7 @@ class LowTemperatureLaunchEconomicsTest(unittest.TestCase):
         self.assertNotIn("self-hosted", workflow)
         self.assertNotIn("secrets.", workflow)
         self.assertNotIn("portfolio", workflow)
+        self.assertNotIn("actions/download-artifact", workflow)
 
 
 if __name__ == "__main__":

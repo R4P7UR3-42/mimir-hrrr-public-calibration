@@ -1,0 +1,15 @@
+{
+  "schema": "hrrr_v4_low_temperature_launch_partial_cache_seal_v1",
+  "source_repository": "R4P7UR3-42/mimir-hrrr-public-calibration",
+  "source_run_id": 33324290727,
+  "source_job_id": 99291592919,
+  "source_head_sha": "57ca65566d1737344db5949ae8c0a8cad49b2871",
+  "archive": "raw.tar.gz",
+  "archive_sha256": "569d2fb4535d42be3937d76d46ea44a85799e43d756f35523aeaab066ea9db4d",
+  "request_records": 201,
+  "inherited_cache_hits": 95,
+  "new_network_requests": 106,
+  "terminal_exception": "Exact lower-outer market identity is invalid for KXLOWTATL-26APR14-T54",
+  "outcomes_scored_before_seal": false,
+  "active_trading_capability_changed": false
+}
